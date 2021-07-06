@@ -4,9 +4,20 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
+const { sequelize } = require("./models");
 // app set
 const app = express();
 app.set("port", process.env.PORT || 3001);
+
+// sequelize sync
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log("정상적으로 데이터베이스에 연결되었습니다.");
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 
 // middleware setting
 app.use(morgan("dev"));
