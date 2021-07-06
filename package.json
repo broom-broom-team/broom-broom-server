@@ -1,0 +1,28 @@
+{
+  "name": "broom-broom-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/broom-broom-team/broom-broom-server.git"
+  },
+  "keywords": [],
+  "author": "yooncoding",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/broom-broom-team/broom-broom-server/issues"
+  },
+  "homepage": "https://github.com/broom-broom-team/broom-broom-server#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.9"
+  }
+}
