@@ -4,10 +4,6 @@ module.exports = class UserAddress extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        simpleAddress: {
-          type: Sequelize.STRING(20),
-          allowNull: false,
-        },
         addressScope: {
           type: Sequelize.INTEGER,
           allowNull: false,

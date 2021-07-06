@@ -11,6 +11,7 @@ module.exports = class District extends Sequelize.Model {
         adm_cd: {
           type: Sequelize.INTEGER,
           allowNull: false,
+          primaryKey: true,
         },
         adm_cd2: {
           type: Sequelize.INTEGER,
@@ -33,6 +34,10 @@ module.exports = class District extends Sequelize.Model {
           allowNull: false,
         },
         emdnm: {
+          type: Sequelize.STRING(20),
+          allowNull: false,
+        },
+        simpleAddress: {
           type: Sequelize.STRING(20),
           allowNull: false,
         },
