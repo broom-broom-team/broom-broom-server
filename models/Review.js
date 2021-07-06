@@ -21,5 +21,8 @@ module.exports = class Review extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.Review.belongsTo(db.Post, { foreignKey: "postId", targetKey: "id" });
+    db.Review.belongsTo(db.User, { foreignKey: "registerId", targetKey: "id" });
+  }
 };

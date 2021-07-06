@@ -37,7 +37,7 @@ module.exports = class District extends Sequelize.Model {
           type: Sequelize.STRING(20),
           allowNull: false,
         },
-        simpleAddress: {
+        simpleaddress: {
           type: Sequelize.STRING(20),
           allowNull: false,
         },
@@ -67,5 +67,8 @@ module.exports = class District extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.District.hasMany(db.Post, { foreignKey: "sellingDistrict", sourceKey: "adm_cd" });
+    db.District.hasMany(db.UserAddress, { foreignKey: "districtId", sourceKey: "adm_cd" });
+  }
 };

@@ -21,5 +21,7 @@ module.exports = class PostImage extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.PostImage.belongsTo(db.Post, { foreignKey: "postId", targetKey: "id" });
+  }
 };

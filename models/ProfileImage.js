@@ -21,5 +21,7 @@ module.exports = class ProfileImage extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.ProfileImage.belongsTo(db.User, { foreignKey: "userId", targetKey: "id" });
+  }
 };

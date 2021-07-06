@@ -51,5 +51,12 @@ module.exports = class User extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.User.hasMany(db.Post, { foreignKey: "sellerId", sourceKey: "id" });
+    db.User.hasMany(db.UserAddress, { foreignKey: "userId", sourceKey: "id" });
+    db.User.hasMany(db.ProfileImage, { foreignKey: "userId", sourceKey: "id" });
+    db.User.hasMany(db.ChatRoom, { foreignKey: "setterId", sourceKey: "id" });
+    db.User.hasMany(db.ChatMessage, { foreignKey: "senderId", sourceKey: "id" });
+    db.User.hasMany(db.Review, { foreignKey: "registerId", sourceKey: "id" });
+  }
 };

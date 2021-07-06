@@ -26,5 +26,8 @@ module.exports = class ChatMessage extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.ChatMessage.belongsTo(db.User, { foreignKey: "senderId", targetKey: "id" });
+    db.ChatMessage.belongsTo(db.ChatRoom, { foreignKey: "chatRoomId", targetKey: "id" });
+  }
 };

@@ -6,7 +6,7 @@ module.exports = class Post extends Sequelize.Model {
       {
         buyerId: {
           type: Sequelize.INTEGER,
-          allowNull: false,
+          allowNull: true,
         },
         title: {
           type: Sequelize.STRING(40),
@@ -46,5 +46,11 @@ module.exports = class Post extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.Post.belongsTo(db.User, { foreignKey: "sellerId", targetKey: "id" });
+    db.Post.belongsTo(db.District, { foreignKey: "sellingDistrict", targetKey: "adm_cd" });
+    db.Post.hasMany(db.PostImage, { foreignKey: "postId", sourceKey: "id" });
+    db.Post.hasMany(db.ChatRoom, { foreignKey: "postId", sourceKey: "id" });
+    db.Post.hasMany(db.Review, { foreignKey: "postId", sourceKey: "id" });
+  }
 };

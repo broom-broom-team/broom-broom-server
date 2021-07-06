@@ -25,5 +25,8 @@ module.exports = class UserAddress extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.UserAddress.belongsTo(db.District, { foreignKey: "districtId", targetKey: "adm_cd" });
+    db.UserAddress.belongsTo(db.User, { foreignKey: "userId", targetKey: "id" });
+  }
 };
