@@ -108,4 +108,6 @@ dist
 
 # util
 test.js
+sql.js
+pool.js
 todo.txt

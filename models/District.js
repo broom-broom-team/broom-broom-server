@@ -4,61 +4,56 @@ module.exports = class District extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        adm_nm: {
-          type: Sequelize.STRING(30),
-          allowNull: false,
-        },
-        adm_cd: {
+        id: {
           type: Sequelize.INTEGER,
+          allowNull: true,
+        },
+        ADMNM: {
+          type: Sequelize.STRING(30),
+          allowNull: true,
+        },
+        ADMCD: {
+          type: Sequelize.BIGINT(30),
           allowNull: false,
           primaryKey: true,
         },
-        adm_cd2: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-        sgg: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-        sido: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-        sidonm: {
+        SIDONM: {
           type: Sequelize.STRING(20),
-          allowNull: false,
+          allowNull: true,
         },
-        sggnm: {
+        SGGNM: {
           type: Sequelize.STRING(20),
-          allowNull: false,
+          allowNull: true,
         },
-        emdnm: {
+        EMDNM: {
           type: Sequelize.STRING(20),
-          allowNull: false,
+          allowNull: true,
         },
-        simpleaddress: {
+        simpleAddress: {
           type: Sequelize.STRING(20),
-          allowNull: false,
+          allowNull: true,
+        },
+        X: {
+          type: Sequelize.FLOAT(20),
+          allowNull: true,
+        },
+        Y: {
+          type: Sequelize.FLOAT(20),
+          allowNull: true,
         },
         geopoint: {
           type: Sequelize.GEOMETRY("POINT", 4326),
-          allowNull: false,
+          allowNull: true,
         },
         geopolygon: {
           type: Sequelize.GEOMETRY("POLYGON", 4326),
-          allowNull: false,
-        },
-        version: {
-          type: Sequelize.DATEONLY,
-          allowNull: false,
-          defaultValue: Sequelize.NOW,
+          allowNull: true,
         },
       },
       {
         sequelize,
         timestamps: false,
-        underscored: true,
+        underscored: false,
         modelName: "District",
         tableName: "districts",
         paranoid: false,
@@ -68,7 +63,7 @@ module.exports = class District extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.District.hasMany(db.Post, { foreignKey: "sellingDistrict", sourceKey: "adm_cd" });
-    db.District.hasMany(db.UserAddress, { foreignKey: "districtId", sourceKey: "adm_cd" });
+    db.District.hasMany(db.Post, { foreignKey: "sellingDistrict", sourceKey: "ADMCD" });
+    db.District.hasMany(db.UserAddress, { foreignKey: "districtId", sourceKey: "ADMCD" });
   }
 };
