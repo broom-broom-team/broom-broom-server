@@ -111,3 +111,5 @@ test.js
 sql.js
 pool.js
 todo.txt
+geojson_insert.js
+ex.geojson

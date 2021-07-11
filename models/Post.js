@@ -48,7 +48,7 @@ module.exports = class Post extends Sequelize.Model {
   }
   static associate(db) {
     db.Post.belongsTo(db.User, { foreignKey: "sellerId", targetKey: "id" });
-    db.Post.belongsTo(db.District, { foreignKey: "sellingDistrict", targetKey: "ADMCD" });
+    db.Post.belongsTo(db.District, { foreignKey: "sellingDistrict", targetKey: "id" });
     db.Post.hasMany(db.PostImage, { foreignKey: "postId", sourceKey: "id" });
     db.Post.hasMany(db.ChatRoom, { foreignKey: "postId", sourceKey: "id" });
     db.Post.hasMany(db.Review, { foreignKey: "postId", sourceKey: "id" });

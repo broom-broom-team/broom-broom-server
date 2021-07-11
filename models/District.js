@@ -6,7 +6,8 @@ module.exports = class District extends Sequelize.Model {
       {
         id: {
           type: Sequelize.INTEGER,
-          allowNull: true,
+          allowNull: false,
+          primaryKey: true,
         },
         ADMNM: {
           type: Sequelize.STRING(30),
@@ -14,8 +15,7 @@ module.exports = class District extends Sequelize.Model {
         },
         ADMCD: {
           type: Sequelize.BIGINT(30),
-          allowNull: false,
-          primaryKey: true,
+          allowNull: true,
         },
         SIDONM: {
           type: Sequelize.STRING(20),
@@ -34,11 +34,11 @@ module.exports = class District extends Sequelize.Model {
           allowNull: true,
         },
         X: {
-          type: Sequelize.FLOAT(20),
+          type: Sequelize.INTEGER,
           allowNull: true,
         },
         Y: {
-          type: Sequelize.FLOAT(20),
+          type: Sequelize.INTEGER,
           allowNull: true,
         },
         geopoint: {
@@ -63,7 +63,7 @@ module.exports = class District extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.District.hasMany(db.Post, { foreignKey: "sellingDistrict", sourceKey: "ADMCD" });
-    db.District.hasMany(db.UserAddress, { foreignKey: "districtId", sourceKey: "ADMCD" });
+    db.District.hasMany(db.Post, { foreignKey: "sellingDistrict", sourceKey: "id" });
+    db.District.hasMany(db.UserAddress, { foreignKey: "districtId", sourceKey: "id" });
   }
 };
