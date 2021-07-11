@@ -18,12 +18,15 @@
   },
   "homepage": "https://github.com/broom-broom-team/broom-broom-server#readme",
   "dependencies": {
+    "csv-writer": "^1.6.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "morgan": "^1.10.0",
     "mysql2": "^2.2.5",
+    "proj4": "^2.7.4",
     "sequelize": "^6.6.4",
-    "sequelize-cli": "^6.2.0"
+    "sequelize-cli": "^6.2.0",
+    "terraformer-wkt-parser": "^1.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.9"
