@@ -22,7 +22,6 @@ exports.post_signup = async (req, res, next) => {
       }
     }
   } catch (e) {
-    console.error(e);
     return next(e);
   }
 };
