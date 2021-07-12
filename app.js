@@ -5,6 +5,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const { sequelize } = require("./models");
+const router = require("./routes");
+
 // app set
 const app = express();
 app.set("port", process.env.PORT || 3001);
@@ -25,6 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // router
+app.use("/", router());
 app.use("/favicon.ico", (req, res) => {
   res.status(204);
 });
