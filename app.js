@@ -24,6 +24,11 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// router
+app.use("/favicon.ico", (req, res) => {
+  res.status(204);
+});
+
 // 404
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
