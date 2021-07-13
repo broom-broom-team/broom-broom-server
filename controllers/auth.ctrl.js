@@ -1,5 +1,7 @@
 const model = require("../models");
 const bcrypt = require("bcrypt");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
 
 exports.post_signup = async (req, res, next) => {
   const { email, nickname, password, confirm_pwd, phoneNumber } = req.body;
@@ -24,4 +26,22 @@ exports.post_signup = async (req, res, next) => {
   } catch (e) {
     return next(e);
   }
+};
+
+exports.post_signin = async (req, res, next) => {
+  passport.authenticate("local", { session: false }, (authError, user, info) => {
+    if (authError) {
+      return next(authError);
+    }
+    if (!user) {
+      return res.status(400).json({ success: false, message: info.message });
+    }
+    return req.login(user, (loginError) => {
+      if (loginError) {
+        return next(loginError);
+      }
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "5h" });
+      return res.status(200).json({ success: true, message: "로그인에 성공하였습니다.", token });
+    });
+  })(req, res, next);
 };

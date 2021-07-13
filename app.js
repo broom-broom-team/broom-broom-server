@@ -4,15 +4,18 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const logger = require("./helpers/winston");
+const passport = require("passport");
 
 dotenv.config();
 
 const { sequelize } = require("./models");
 const router = require("./routes");
+const passportConfig = require("./helpers/passport");
 
 // app set
 const app = express();
 app.set("port", process.env.PORT || 3001);
+passportConfig();
 
 // sequelize sync
 sequelize
@@ -47,6 +50,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(session(sessionOption));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // router
 app.use("/", router());
