@@ -10,10 +10,17 @@ function authRouter(root) {
    * @routes POST /auth/signup
    */
   router.post("/signup", vaild.auth.valid_signup, ctrl.auth.post_signup);
+
   /**
    * @description 로그인
    * @routes POST /auth/signin
    */
   router.post("/signin", ctrl.auth.post_signin);
+
+  /**
+   * @description 이메일 인증번호 발송
+   * @routes POST /auth/sendEmail
+   */
+  router.post("/sendEmail", vaild.auth.valid_sendEmail, ctrl.auth.post_sendEmail);
 }
 module.exports = authRouter;
