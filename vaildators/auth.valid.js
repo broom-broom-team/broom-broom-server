@@ -26,7 +26,7 @@ exports.valid_signup = (req, res, next) => {
 };
 
 // TODO: 나중에 프론트 개발되면 valid_signup에서 이메일 유효성검사는 지우기
-exports.valid_sendEmail = (req, res, next) => {
+exports.valid_send = (req, res, next) => {
   const { email } = req.body;
   if (email_regex.test(email)) next();
   else return res.status(400).json({ success: false, message: "잘못된 형식의 이메일 주소입니다." });

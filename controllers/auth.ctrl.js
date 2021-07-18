@@ -46,7 +46,7 @@ exports.post_signin = async (req, res, next) => {
   })(req, res, next);
 };
 
-exports.post_sendEmail = async (req, res, next) => {
+exports.post_send = async (req, res, next) => {
   const { email } = req.body;
   const { generateSecret, sendSecretMail } = require("../helpers/nodemailer");
   try {
@@ -54,7 +54,7 @@ exports.post_sendEmail = async (req, res, next) => {
     if (exUser) {
       return res.status(400).json({ success: false, message: "이미 존재하는 이메일입니다." });
     } else {
-      // TODO: 인증번호 발송 코드 작성
+      // TODO: 쿠키로 보관시 보안상문제있는지 물어보기 -> 어차피 암호화돼서 상관없으려나..?
       const secretKey = generateSecret();
       await sendSecretMail(email, secretKey);
       return res.cookie("secretKey", secretKey, { expiresIn: "30m" }).status(200).json({ success: true, message: "이메일 전송을 성공하였습니다.", secretKey });
