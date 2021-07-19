@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 exports.generateSecret = () => {
   let randomNumber = "";
   for (let i = 0; i < 6; i++) {
-    randomNumber += Math.floor(Math.random() * 9);
+    randomNumber += Math.floor(Math.random() * 8 + 1);
   }
   return Number(randomNumber);
 };
