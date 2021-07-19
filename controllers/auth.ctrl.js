@@ -45,3 +45,39 @@ exports.post_signin = async (req, res, next) => {
     });
   })(req, res, next);
 };
+
+exports.post_send = async (req, res, next) => {
+  const { email } = req.body;
+  const { generateSecret, sendSecretMail } = require("../helpers/nodemailer");
+  try {
+    const exUser = await model.User.findOne({ where: { email } });
+    if (exUser) {
+      return res.status(400).json({ success: false, message: "이미 존재하는 이메일입니다." });
+    } else {
+      // TODO: 쿠키로 보관시 보안상문제있는지 물어보기 -> 어차피 암호화돼서 상관없으려나..?
+      const secretKey = generateSecret();
+      await sendSecretMail(email, secretKey);
+      return res.cookie("secretKey", secretKey, { expiresIn: "30m" }).status(200).json({ success: true, message: "이메일 전송을 성공하였습니다.", secretKey });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.post_confirm = async (req, res, next) => {
+  const { secret } = req.body;
+  try {
+    const { secretKey } = req.cookies;
+    if (secretKey) {
+      if (secretKey == secret) {
+        return res.clearCookie("secretKey").status(200).json({ success: true, message: "이메일 인증을 성공하였습니다!" });
+      } else {
+        return res.status(400).json({ success: false, message: "인증번호가 일치하지 않습니다." });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "인증번호전송을 누르고 다시 시도해주세요." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
