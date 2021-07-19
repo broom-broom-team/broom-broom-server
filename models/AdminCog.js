@@ -34,6 +34,6 @@ module.exports = class AdminCog extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.Cog.belongsTo(db.User, { foreignKey: "userId", targetKey: "id" });
+    db.AdminCog.belongsTo(db.User, { foreignKey: "userId", targetKey: "id" });
   }
 };

@@ -52,6 +52,6 @@ ChatMessage.associate(db);
 Review.associate(db);
 UserAddress.associate(db);
 District.associate(db);
-AdminCog.init(sequelize);
+AdminCog.associate(db);
 
 module.exports = db;

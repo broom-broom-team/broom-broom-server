@@ -19,7 +19,7 @@ passportConfig();
 
 // sequelize sync
 sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() => {
     logger.info("정상적으로 데이터베이스에 연결되었습니다.");
   })
