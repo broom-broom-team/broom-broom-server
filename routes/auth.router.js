@@ -22,5 +22,11 @@ function authRouter(root) {
    * @routes POST /auth/send
    */
   router.post("/send", vaild.auth.valid_send, ctrl.auth.post_send);
+
+  /**
+   * @description 이메일 인증번호 확인
+   * @routes POST /auth/confirm
+   */
+  router.post("/confirm", vaild.auth.valid_confirm, ctrl.auth.post_confirm);
 }
 module.exports = authRouter;
