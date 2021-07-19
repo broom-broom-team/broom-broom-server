@@ -81,3 +81,22 @@ exports.post_confirm = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.post_temp = async (req, res, next) => {
+  const { email, phoneNumber } = req.body;
+  const { generatePassword, sendTempPassword } = require("../helpers/nodemailer");
+  try {
+    const exUser = await model.User.findOne({ where: { email, phoneNumber } });
+    if (exUser) {
+      const tempPassword = generatePassword();
+      await sendTempPassword(email, tempPassword);
+      const hash = await bcrypt.hash(tempPassword, await bcrypt.genSalt(12));
+      await model.User.update({ password: hash }, { where: { email } });
+      return res.status(200).json({ success: true, message: "임시 비밀번호 발급 완료!" });
+    } else {
+      return res.status(400).json({ success: false, message: "이메일과 휴대폰번호가 일치하는 회원정보가 없습니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
