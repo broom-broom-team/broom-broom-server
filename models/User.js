@@ -7,7 +7,11 @@ module.exports = class User extends Sequelize.Model {
         isAdmin: {
           type: Sequelize.BOOLEAN,
           allowNull: false,
-          defaultValue: 1,
+          defaultValue: 0,
+        },
+        name: {
+          type: Sequelize.STRING(10),
+          allowNull: false,
         },
         email: {
           type: Sequelize.STRING(40),
@@ -54,6 +58,7 @@ module.exports = class User extends Sequelize.Model {
   static associate(db) {
     db.User.hasMany(db.Post, { foreignKey: "sellerId", sourceKey: "id" });
     db.User.hasMany(db.UserAddress, { foreignKey: "userId", sourceKey: "id" });
+    db.User.hasMany(db.Cog, { foreignKey: "userId", sourceKey: "id" });
     db.User.hasMany(db.ProfileImage, { foreignKey: "userId", sourceKey: "id" });
     db.User.hasMany(db.ChatRoom, { foreignKey: "setterId", sourceKey: "id" });
     db.User.hasMany(db.ChatMessage, { foreignKey: "senderId", sourceKey: "id" });
