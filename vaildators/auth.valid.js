@@ -13,7 +13,7 @@ exports.valid_signup = (req, res, next) => {
         if (phone_regex.test(phoneNumber)) {
           next();
         } else {
-          return res.status(400).json({ success: false, message: "휴대폰번호는 숫자만 입력해야 합니다." });
+          return res.status(400).json({ success: false, message: "휴대폰번호는 숫자 10~11글자만 입력해야 합니다." });
         }
       } else {
         return res.status(400).json({ success: false, message: "비밀번호는 숫자, 영문, 특수문자를 조합하여 8~16자리를 사용해야 합니다." });
@@ -37,4 +37,15 @@ exports.valid_confirm = (req, res, next) => {
   const { secret } = req.body;
   if (secret_regex.test(secret)) next();
   else return res.status(400).json({ success: false, message: "인증번호는 숫자 6글자만 입력해야 합니다." });
+};
+
+exports.valid_temp = (req, res, next) => {
+  const { email, phoneNumber } = req.body;
+  if (!email_regex.test(email)) {
+    return res.status(400).json({ success: false, message: "잘못된 형식의 이메일 주소입니다." });
+  }
+  if (!phone_regex.test(phoneNumber)) {
+    return res.status(400).json({ success: false, message: "휴대폰번호는 숫자 10~11글자만 입력해야 합니다." });
+  }
+  next();
 };

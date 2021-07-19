@@ -28,5 +28,11 @@ function authRouter(root) {
    * @routes POST /auth/confirm
    */
   router.post("/confirm", vaild.auth.valid_confirm, ctrl.auth.post_confirm);
+
+  /**
+   * @description 임시 비밀번호 발급
+   * @routes POST /auth/temppwd
+   */
+  router.post("/temp", vaild.auth.valid_temp, ctrl.auth.post_temp);
 }
 module.exports = authRouter;
