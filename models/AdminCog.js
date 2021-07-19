@@ -18,7 +18,7 @@ module.exports = class AdminCog extends Sequelize.Model {
         },
         amount: {
           type: Sequelize.INTEGER,
-          allowNull: trues,
+          allowNull: true,
         },
       },
       {

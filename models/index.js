@@ -12,6 +12,7 @@ const ChatMessage = require("./ChatMessage");
 const Review = require("./Review");
 const UserAddress = require("./UserAddress");
 const District = require("./District");
+const AdminCog = require("./AdminCog");
 
 const db = {};
 
@@ -29,6 +30,7 @@ db.ChatMessage = ChatMessage;
 db.Review = Review;
 db.UserAddress = UserAddress;
 db.District = District;
+db.AdminCog = AdminCog;
 
 User.init(sequelize);
 Post.init(sequelize);
@@ -39,6 +41,7 @@ ChatMessage.init(sequelize);
 Review.init(sequelize);
 UserAddress.init(sequelize);
 District.init(sequelize);
+AdminCog.init(sequelize);
 
 District.associate(db);
 Post.associate(db);
@@ -49,5 +52,6 @@ ChatMessage.associate(db);
 Review.associate(db);
 UserAddress.associate(db);
 District.associate(db);
+AdminCog.init(sequelize);
 
 module.exports = db;
