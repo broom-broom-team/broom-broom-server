@@ -1,2 +1,3 @@
 const auth = require("../controllers/auth.ctrl");
-module.exports = { auth };
+const address = require("../controllers/address.ctrl");
+module.exports = { auth, address };

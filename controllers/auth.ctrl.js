@@ -16,7 +16,9 @@ exports.post_signup = async (req, res, next) => {
       } else {
         if (password == confirm_pwd) {
           const hash = await bcrypt.hash(password, await bcrypt.genSalt(12));
-          await model.User.create({ email, nickname, name, password: hash, phoneNumber });
+          const user = await model.User.create({ email, nickname, name, password: hash, phoneNumber });
+          // 초기 주소 설정 => 인천 송도 1동 (districts.id is 826)
+          await model.UserAddress.create({ addressScope: 0, neighboehoods: "826", districtId: 826, userId: user.id });
           return res.status(200).json({ success: true, message: "회원가입이 완료되었습니다." });
         } else {
           return res.status(400).json({ success: false, message: "비밀번호가 틀렸습니다. 다시 입력해 주세요." });

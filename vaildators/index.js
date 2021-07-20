@@ -1,2 +1,3 @@
 const auth = require("../vaildators/auth.valid");
-module.exports = { auth };
+const address = require("../vaildators/address.valid");
+module.exports = { auth, address };
