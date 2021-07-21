@@ -26,11 +26,11 @@ exports.post_check = async (req, res, next) => {
       )}', 4326))), ${addressScope * 0.01})), 4326));`
     );
     conn.release();
-    const neighboehoods = new Array();
+    const neighborhoods = new Array();
     for (let i = 0; i < districts.length; i++) {
-      neighboehoods.push(districts[i].simpleAddress);
+      neighborhoods.push(districts[i].simpleAddress);
     }
-    return res.status(200).json({ success: true, message: "활동범위내 근처동네들을 불러옵니다.", count: neighboehoods.length, neighboehoods });
+    return res.status(200).json({ success: true, message: "활동범위내 근처동네들을 불러옵니다.", count: neighborhoods.length, neighborhoods });
   } catch (e) {
     return next(e);
   }

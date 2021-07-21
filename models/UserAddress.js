@@ -8,7 +8,7 @@ module.exports = class UserAddress extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
-        neighboehoods: {
+        neighborhoods: {
           type: Sequelize.TEXT,
           allowNull: false,
         },
