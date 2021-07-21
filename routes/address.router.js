@@ -12,6 +12,12 @@ function addressRouter(root) {
    * @routes GET /address
    */
   router.get("/", ctrl.address.get_address);
+
+  /**
+   * @description 활동범위에 위치한 근처동네 확인하기
+   * @routes POSt /address/check
+   */
+  router.post("/check", vaild.address.post_check, ctrl.address.post_check);
 }
 
 module.exports = addressRouter;
