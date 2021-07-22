@@ -31,6 +31,12 @@ function addressRouter(root) {
    * @routes PUT /address/:id
    */
   router.put("/:id", ctrl.address.put_address);
+
+  /**
+   * @description 활동지역 설정하기
+   * @routes POST /address
+   */
+  router.post("/", vaild.address.post_check, ctrl.address.post_address);
 }
 
 module.exports = addressRouter;

@@ -90,7 +90,31 @@ exports.put_address = async (req, res, next) => {
   const districtId = req.params.id;
   try {
     await model.UserAddress.update({ districtId }, { where: { userId: req.user.id } });
-    return res.status(200).json({ success: true, message: "기준지역을 변경합니다." });
+    return res.status(200).json({ success: true, message: "기준지역을 변경이 완료되었습니다." });
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.post_address = async (req, res, next) => {
+  const pool = require("../helpers/pool");
+  const { addressScope } = req.body;
+  try {
+    const userAddress = await model.UserAddress.findOne({ where: { userId: req.user.id } });
+    const district = await model.District.findOne({ where: { id: userAddress.districtId } });
+    const conn = await pool.getConn();
+    const [districts] = await conn.query(
+      `SELECT * FROM districts WHERE ST_Intersects(geopolygon, ST_GeomFromText(ST_AsText(ST_Buffer(ST_GeomFromText(ST_AsText(ST_GeomFromText('${wkt.convert(
+        district.geopoint
+      )}', 4326))), ${addressScope * 0.01})), 4326));`
+    );
+    conn.release();
+    let neighborhoods = new String();
+    for (let i = 0; i < districts.length; i++) {
+      neighborhoods += districts[i].id + " ";
+    }
+    await model.UserAddress.update({ neighborhoods, addressScope }, { where: { userId: req.user.id } });
+    return res.status(200).json({ success: true, message: "활동지역 설정이 완료되었습니다." });
   } catch (e) {
     return next(e);
   }
