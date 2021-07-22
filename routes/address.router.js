@@ -15,9 +15,16 @@ function addressRouter(root) {
 
   /**
    * @description 활동범위에 위치한 근처동네 확인하기
-   * @routes POSt /address/check
+   * @routes POST /address/check
    */
   router.post("/check", vaild.address.post_check, ctrl.address.post_check);
+
+  /**
+   * @description 활동범위에 위치한 근처동네 확인하기
+   * @routes GET /address/search?name={}
+   * @routes GET /address/search
+   */
+  router.get("/search", vaild.address.get_search, ctrl.address.get_search);
 }
 
 module.exports = addressRouter;
