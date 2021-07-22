@@ -85,3 +85,13 @@ exports.get_search = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.put_address = async (req, res, next) => {
+  const districtId = req.params.id;
+  try {
+    await model.UserAddress.update({ districtId }, { where: { userId: req.user.id } });
+    return res.status(200).json({ success: true, message: "기준지역을 변경합니다." });
+  } catch (e) {
+    return next(e);
+  }
+};
