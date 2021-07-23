@@ -33,7 +33,7 @@ module.exports = class User extends Sequelize.Model {
           unique: true,
         },
         mannerPoint: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.FLOAT,
           allowNull: false,
           defaultValue: 0,
         },

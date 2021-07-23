@@ -2,6 +2,7 @@ const nick_regex = /^[가-힣|a-z|A-Z|0-9|]{2,8}$/;
 const name_regex = /^[가-힣]{2,8}$/;
 const phone_regex = /^[0-9]{10,11}/;
 const pwd_regex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
+const amount_regex = /^[0-9]{1,11}/;
 
 exports.post_edit = (req, res, next) => {
   const { name, nickname, phoneNumber } = req.body;
@@ -23,4 +24,33 @@ exports.put_edit_pwd = (req, res, next) => {
     return res.status(400).json({ success: false, message: "비밀번호는 숫자, 영문, 특수문자를 조합하여 8~16자리를 사용해야 합니다." });
   }
   next();
+};
+
+exports.post_point = (req, res, next) => {
+  // 환급하려는 포인트는 1000원이상부터 가능하다.
+  // type에 따라 필수로 입력해야하는 값이 있다. => 충전: chargeAmount, 환급: refundAmount, bankName, account
+  const type = req.params.type;
+  if (type == "refund") {
+    const { refundAmount } = req.body;
+    if (refundAmount) {
+      if (amount_regex.test(refundAmount)) {
+        next();
+      } else {
+        return res.status(400).json({ success: false, message: "충전하실 금액은 숫자만 입력가능합니다." });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "충전하실 금액을 입력해주세요." });
+    }
+  } else {
+    const { chargeAmount, bankName, account } = req.body;
+    if (chargeAmount && bankName && account) {
+      if (amount_regex.test(chargeAmount)) {
+        next();
+      } else {
+        return res.status(400).json({ success: false, message: "충전하실 금액은 숫자만 입력가능합니다." });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "환급받을 계좌의 정보를 모두 입력해주세요." });
+    }
+  }
 };

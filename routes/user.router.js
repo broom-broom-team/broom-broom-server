@@ -30,5 +30,17 @@ function userRouter(root) {
    * @routes PUT /user/edit/pwd
    */
   router.put("/edit/pwd", vaild.user.put_edit_pwd, ctrl.user.put_edit_pwd);
+
+  /**
+   * @description 포인트 충전하기 포인트 불러오기
+   * @routes GET /user/point
+   */
+  router.get("/point", ctrl.user.get_point);
+
+  /**
+   * @description 포인트 충전하기
+   * @routes POST /user/point/:type
+   */
+  router.post("/point/:type", vaild.user.post_point, ctrl.user.post_point);
 }
 module.exports = userRouter;
