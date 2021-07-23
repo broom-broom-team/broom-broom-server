@@ -32,7 +32,7 @@ module.exports = class User extends Sequelize.Model {
           allowNull: false,
           unique: true,
         },
-        mannerPonit: {
+        mannerPoint: {
           type: Sequelize.INTEGER,
           allowNull: false,
           defaultValue: 0,
