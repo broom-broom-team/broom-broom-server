@@ -24,5 +24,11 @@ function userRouter(root) {
    * @routes POST /user/edit
    */
   router.post("/edit", vaild.user.post_edit, ctrl.user.post_edit);
+
+  /**
+   * @description 비밀번호 변경하기
+   * @routes PUT /user/edit/pwd
+   */
+  router.put("/edit/pwd", vaild.user.put_edit_pwd, ctrl.user.put_edit_pwd);
 }
 module.exports = userRouter;

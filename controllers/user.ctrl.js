@@ -47,3 +47,24 @@ exports.post_edit = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.put_edit_pwd = async (req, res, next) => {
+  const { password, confirm_pwd, current_pwd } = req.body;
+  try {
+    const user = await model.User.findByPk(req.user.id);
+    const passwordCheck = await bcrypt.compare(current_pwd, user.password);
+    if (passwordCheck) {
+      if (password == confirm_pwd) {
+        const hash = await bcrypt.hash(password, await bcrypt.genSalt(12));
+        await model.User.update({ password: hash }, { where: { id: req.user.id } });
+        return res.status(200).json({ success: true, message: "비밀번호 수정이 완료되었습니다." });
+      } else {
+        return res.status(400).json({ success: false, message: "변경하려는 비밀번호가 틀렸습니다. 다시 입력해 주세요." });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "현재 비밀번호가 일치하지 않습니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
