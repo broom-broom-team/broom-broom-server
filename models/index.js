@@ -43,6 +43,7 @@ UserAddress.init(sequelize);
 District.init(sequelize);
 AdminCog.init(sequelize);
 
+User.associate(db);
 District.associate(db);
 Post.associate(db);
 ProfileImage.associate(db);
