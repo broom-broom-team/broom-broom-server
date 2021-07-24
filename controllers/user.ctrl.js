@@ -3,13 +3,14 @@ const bcrypt = require("bcrypt");
 
 exports.get_user = async (req, res, next) => {
   try {
-    const user = await model.User.findOne({ where: { id: req.user.id } });
+    const user = await model.User.findOne({ include: [{ model: model.ProfileImage }], where: { id: req.user.id } });
     const userAdderss = await model.UserAddress.findOne({ include: [{ model: model.District }] }, { where: { userId: req.user.id } });
     const mypage = {
       nickname: user.nickname,
       mannerPoint: user.mannerPoint.toFixed(2),
       cash: user.cash.toLocaleString() + "P",
       simpleAddress: userAdderss.District.simpleAddress,
+      profileImage: user.ProfileImages[0].profileImageURI,
     };
     return res.status(200).json({ success: true, message: "마이페이지 유저정보를 불러옵니다.", mypage });
   } catch (e) {
@@ -19,8 +20,13 @@ exports.get_user = async (req, res, next) => {
 
 exports.get_edit = async (req, res, next) => {
   try {
-    const user = await model.User.findByPk(req.user.id);
-    const editpage = { nickname: user.nickname, name: user.name, phoneNumber: user.phoneNumber };
+    const user = await model.User.findOne({ include: [{ model: model.ProfileImage }], where: { id: req.user.id } });
+    const editpage = {
+      nickname: user.nickname,
+      name: user.name,
+      phoneNumber: user.phoneNumber,
+      profileImage: user.ProfileImages[0].profileImageURI,
+    };
     return res.status(200).json({ success: true, message: "프로필 수정을 위한 기존 유저정보를 불러옵니다.", editpage });
   } catch (e) {
     return next(e);
