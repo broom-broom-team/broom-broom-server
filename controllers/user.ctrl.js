@@ -2,6 +2,8 @@ const model = require("../models");
 const bcrypt = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
+const s3 = require("../config/s3.config");
+const profileDefault = "https://broombroom.s3.ap-northeast-2.amazonaws.com/broomProfile-default.png";
 
 exports.get_user = async (req, res, next) => {
   try {
@@ -38,9 +40,8 @@ exports.get_edit = async (req, res, next) => {
 exports.post_edit = async (req, res, next) => {
   const { nickname, name, phoneNumber, password } = req.body;
   try {
-    const uploadDir = path.join(__dirname, "../uploads");
     const user = await model.User.findOne({ include: [{ model: model.ProfileImage }], where: { id: req.user.id } });
-    const profileImageURI = req.file ? req.file.filename : user.ProfileImages[0].profileImageURI;
+    const profileImageURI = req.file ? req.file.location : user.ProfileImages[0].profileImageURI;
     const passwordCheck = await bcrypt.compare(password, user.password);
     if (passwordCheck) {
       const exNickname = await model.User.findOne({ where: { nickname } });
@@ -57,28 +58,42 @@ exports.post_edit = async (req, res, next) => {
           );
           await model.ProfileImage.update({ profileImageURI }, { where: { userId: req.user.id } });
           if (req.file && user.ProfileImages[0].profileImageURI) {
-            if (user.ProfileImages[0].profileImageURI != "broomProfile-default.png") {
-              fs.unlinkSync(uploadDir + "/" + user.ProfileImages[0].profileImageURI);
+            if (user.ProfileImages[0].profileImageURI != profileDefault) {
+              return s3.deleteObject({ Bucket: "broombroom", Key: user.ProfileImages[0].profileImageURI.split("com/")[1] }, () => {
+                res.status(200).json({ success: true, message: "프로필 수정이 완료되었습니다." });
+              });
+            } else {
+              return res.status(200).json({ success: true, message: "프로필 수정이 완료되었습니다." });
             }
+          } else {
+            return res.status(200).json({ success: true, message: "프로필 수정이 완료되었습니다." });
           }
-          return res.status(200).json({ success: true, message: "프로필 수정이 완료되었습니다." });
         } else {
           if (req.file) {
-            fs.unlinkSync(req.file.path);
+            return s3.deleteObject({ Bucket: "broombroom", Key: req.file.key }, () => {
+              res.status(400).json({ success: false, message: "이미 존재하는 휴대폰번호입니다." });
+            });
+          } else {
+            return res.status(400).json({ success: false, message: "이미 존재하는 휴대폰번호입니다." });
           }
-          return res.status(400).json({ success: false, message: "이미 존재하는 휴대폰번호입니다." });
         }
       } else {
         if (req.file) {
-          fs.unlinkSync(req.file.path);
+          return s3.deleteObject({ Bucket: "broombroom", Key: req.file.key }, () => {
+            res.status(400).json({ success: false, message: "이미 존재하는 닉네임입니다." });
+          });
+        } else {
+          return res.status(400).json({ success: false, message: "이미 존재하는 닉네임입니다." });
         }
-        return res.status(400).json({ success: false, message: "이미 존재하는 닉네임입니다." });
       }
     } else {
       if (req.file) {
-        fs.unlinkSync(req.file.path);
+        return s3.deleteObject({ Bucket: "broombroom", Key: req.file.key }, () => {
+          res.status(400).json({ success: false, message: "현재 비밀번호가 일치하지 않습니다." });
+        });
+      } else {
+        return res.status(400).json({ success: false, message: "현재 비밀번호가 일치하지 않습니다." });
       }
-      return res.status(400).json({ success: false, message: "현재 비밀번호가 일치하지 않습니다." });
     }
   } catch (e) {
     return next(e);

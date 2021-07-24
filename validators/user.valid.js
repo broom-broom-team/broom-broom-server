@@ -3,7 +3,7 @@ const name_regex = /^[가-힣]{2,8}$/;
 const phone_regex = /^[0-9]{10,11}/;
 const pwd_regex = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
 const amount_regex = /^[0-9]{1,11}/;
-const fs = require("fs");
+const s3 = require("../config/s3.config");
 
 exports.post_edit = (req, res, next) => {
   const { name, nickname, phoneNumber } = req.body;
@@ -20,20 +20,26 @@ exports.post_edit = (req, res, next) => {
     }
     next();
   } else {
-    const filepath = file.path;
-    if (!nick_regex.test(nickname)) {
-      fs.unlinkSync(filepath);
-      return res.status(400).json({ success: false, message: "닉네임은 특수문자 제외 2~8글자만 사용해야 합니다." });
+    try {
+      if (!nick_regex.test(nickname)) {
+        return s3.deleteObject({ Bucket: "broombroom", Key: req.file.key }, () => {
+          res.status(400).json({ success: false, message: "닉네임은 특수문자 제외 2~8글자만 사용해야 합니다." });
+        });
+      }
+      if (!name_regex.test(name)) {
+        return s3.deleteObject({ Bucket: "broombroom", Key: req.file.key }, () => {
+          res.status(400).json({ success: false, message: "이름은 한글 2~8글자만 사용해야 합니다." });
+        });
+      }
+      if (!phone_regex.test(phoneNumber)) {
+        return s3.deleteObject({ Bucket: "broombroom", Key: req.file.key }, () => {
+          res.status(400).json({ success: false, message: "휴대폰번호는 숫자 10~11글자만 입력해야 합니다." });
+        });
+      }
+      next();
+    } catch (e) {
+      return next(e);
     }
-    if (!name_regex.test(name)) {
-      fs.unlinkSync(filepath);
-      return res.status(400).json({ success: false, message: "이름은 한글 2~8글자만 사용해야 합니다." });
-    }
-    if (!phone_regex.test(phoneNumber)) {
-      fs.unlinkSync(filepath);
-      return res.status(400).json({ success: false, message: "휴대폰번호는 숫자 10~11글자만 입력해야 합니다." });
-    }
-    next();
   }
 };
 

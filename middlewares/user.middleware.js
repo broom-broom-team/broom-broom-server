@@ -1,12 +1,12 @@
-const path = require("path");
 const multer = require("multer");
-const uploadDir = path.join(__dirname, "../uploads");
+const multerS3 = require("multer-s3");
 
-const storage = multer.diskStorage({
-  destination: (req, file, done) => {
-    done(null, uploadDir);
-  },
-  filename: (req, file, done) => {
+const s3 = require("../config/s3.config");
+
+const storage = multerS3({
+  s3: s3,
+  bucket: "broombroom",
+  key: (req, file, done) => {
     const extension = file.mimetype.split("/")[1];
     done(null, "broomProfile-" + Date.now() + "." + extension);
   },
