@@ -24,7 +24,7 @@ exports.post_signup = async (req, res, next) => {
               password: hash,
               phoneNumber,
               UserAddresses: [{ addressScope: 0, neighborhoods: "826", districtId: 826 }],
-              ProfileImages: [{ profileImageURI: "broomProfile-deafault.png" }],
+              ProfileImages: [{ profileImageURI: "broomProfile-default.png" }],
             },
             { include: [{ model: model.UserAddress }, { model: model.ProfileImage }] }
           );

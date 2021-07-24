@@ -1,5 +1,7 @@
 const model = require("../models");
 const bcrypt = require("bcrypt");
+const path = require("path");
+const fs = require("fs");
 
 exports.get_user = async (req, res, next) => {
   try {
@@ -10,7 +12,7 @@ exports.get_user = async (req, res, next) => {
       mannerPoint: user.mannerPoint.toFixed(2),
       cash: user.cash.toLocaleString() + "P",
       simpleAddress: userAdderss.District.simpleAddress,
-      profileImage: user.ProfileImages[0].profileImageURI,
+      profileImageURI: user.ProfileImages[0].profileImageURI,
     };
     return res.status(200).json({ success: true, message: "마이페이지 유저정보를 불러옵니다.", mypage });
   } catch (e) {
@@ -25,7 +27,7 @@ exports.get_edit = async (req, res, next) => {
       nickname: user.nickname,
       name: user.name,
       phoneNumber: user.phoneNumber,
-      profileImage: user.ProfileImages[0].profileImageURI,
+      profileImageURI: user.ProfileImages[0].profileImageURI,
     };
     return res.status(200).json({ success: true, message: "프로필 수정을 위한 기존 유저정보를 불러옵니다.", editpage });
   } catch (e) {
@@ -36,17 +38,46 @@ exports.get_edit = async (req, res, next) => {
 exports.post_edit = async (req, res, next) => {
   const { nickname, name, phoneNumber, password } = req.body;
   try {
-    const user = await model.User.findByPk(req.user.id);
+    const uploadDir = path.join(__dirname, "../uploads");
+    const user = await model.User.findOne({ include: [{ model: model.ProfileImage }], where: { id: req.user.id } });
+    const profileImageURI = req.file ? req.file.filename : user.ProfileImages[0].profileImageURI;
     const passwordCheck = await bcrypt.compare(password, user.password);
     if (passwordCheck) {
       const exNickname = await model.User.findOne({ where: { nickname } });
       if (exNickname == null || exNickname.id == req.user.id) {
-        await model.User.update({ nickname, name, phoneNumber }, { where: { id: req.user.id } });
-        return res.status(200).json({ success: true, message: "프로필 수정이 완료되었습니다." });
+        const exPhoneNumber = await model.User.findOne({ where: { phoneNumber } });
+        if (exPhoneNumber == null || exPhoneNumber.id == req.user.id) {
+          await model.User.update(
+            {
+              nickname,
+              name,
+              phoneNumber,
+            },
+            { where: { id: req.user.id } }
+          );
+          await model.ProfileImage.update({ profileImageURI }, { where: { userId: req.user.id } });
+          if (req.file && user.ProfileImages[0].profileImageURI) {
+            if (user.ProfileImages[0].profileImageURI != "broomProfile-default.png") {
+              fs.unlinkSync(uploadDir + "/" + user.ProfileImages[0].profileImageURI);
+            }
+          }
+          return res.status(200).json({ success: true, message: "프로필 수정이 완료되었습니다." });
+        } else {
+          if (req.file) {
+            fs.unlinkSync(req.file.path);
+          }
+          return res.status(400).json({ success: false, message: "이미 존재하는 휴대폰번호입니다." });
+        }
       } else {
+        if (req.file) {
+          fs.unlinkSync(req.file.path);
+        }
         return res.status(400).json({ success: false, message: "이미 존재하는 닉네임입니다." });
       }
     } else {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
       return res.status(400).json({ success: false, message: "현재 비밀번호가 일치하지 않습니다." });
     }
   } catch (e) {

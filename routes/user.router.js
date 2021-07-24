@@ -23,7 +23,7 @@ function userRouter(root) {
    * @description 프로필 수정하기
    * @routes POST /user/edit
    */
-  router.post("/edit", valid.user.post_edit, ctrl.user.post_edit);
+  router.post("/edit", middleware.user.profileUpload.single("image"), valid.user.post_edit, ctrl.user.post_edit);
 
   /**
    * @description 비밀번호 변경하기
