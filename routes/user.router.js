@@ -26,6 +26,12 @@ function userRouter(root) {
   router.post("/edit", middleware.user.profileUpload.single("image"), valid.user.post_edit, ctrl.user.post_edit);
 
   /**
+   * @description 프로필이미지 기본이미지로 변경하기
+   * @routes PUT /user/edit/image
+   */
+  router.put("/edit/image", ctrl.user.put_edit_image);
+
+  /**
    * @description 비밀번호 변경하기
    * @routes PUT /user/edit/pwd
    */

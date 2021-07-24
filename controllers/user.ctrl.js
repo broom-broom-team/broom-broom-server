@@ -85,6 +85,23 @@ exports.post_edit = async (req, res, next) => {
   }
 };
 
+exports.put_edit_image = async (req, res, next) => {
+  const uploadDir = path.join(__dirname, "../uploads");
+  try {
+    const profileImage = await model.ProfileImage.findOne({ where: { userId: req.user.id } });
+    // TODO: uploads폴더에 profileImage.profileImageURI와 일치하는 파일이 없으면 fs.unlink 막기
+    if (profileImage.profileImageURI != "broomProfile-default.png") {
+      fs.unlinkSync(uploadDir + "/" + profileImage.profileImageURI);
+      await model.ProfileImage.update({ profileImageURI: "broomProfile-default.png" }, { where: { userId: req.user.id } });
+      return res.status(200).json({ success: true, message: "프로필이미지 삭제가 완료되었습니다." });
+    } else {
+      return res.status(400).json({ success: false, message: "현재 등록된 프로필사진이 없습니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
 exports.put_edit_pwd = async (req, res, next) => {
   const { password, confirm_pwd, current_pwd } = req.body;
   try {
