@@ -1,2 +1,4 @@
 const auth = require("../middlewares/auth.middleware");
-module.exports = { auth };
+const user = require("../middlewares/user.middleware");
+
+module.exports = { auth, user };

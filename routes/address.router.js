@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 const ctrl = require("../controllers");
-const vaild = require("../vaildators");
+const valid = require("../validators");
 const middleware = require("../middlewares");
 
 function addressRouter(root) {
@@ -17,14 +17,14 @@ function addressRouter(root) {
    * @description 활동범위에 위치한 근처동네 확인하기
    * @routes POST /address/check
    */
-  router.post("/check", vaild.address.post_check, ctrl.address.post_check);
+  router.post("/check", valid.address.post_check, ctrl.address.post_check);
 
   /**
    * @description 활동지역 변경에서 주소 검색하기
    * @routes GET /address/search?name={}
    * @routes GET /address/search
    */
-  router.get("/search", vaild.address.get_search, ctrl.address.get_search);
+  router.get("/search", valid.address.get_search, ctrl.address.get_search);
 
   /**
    * @description 활동지역 변경하기
@@ -36,7 +36,7 @@ function addressRouter(root) {
    * @description 활동지역 설정하기
    * @routes POST /address
    */
-  router.post("/", vaild.address.post_check, ctrl.address.post_address);
+  router.post("/", valid.address.post_check, ctrl.address.post_address);
 }
 
 module.exports = addressRouter;

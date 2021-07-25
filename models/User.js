@@ -32,8 +32,8 @@ module.exports = class User extends Sequelize.Model {
           allowNull: false,
           unique: true,
         },
-        mannerPonit: {
-          type: Sequelize.INTEGER,
+        mannerPoint: {
+          type: Sequelize.FLOAT,
           allowNull: false,
           defaultValue: 0,
         },
