@@ -1,7 +1,5 @@
 const model = require("../models");
 const bcrypt = require("bcrypt");
-const path = require("path");
-const fs = require("fs");
 const s3 = require("../config/s3.config");
 const profileDefault = "https://broombroom.s3.ap-northeast-2.amazonaws.com/broomProfile-default.png";
 

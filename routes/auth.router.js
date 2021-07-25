@@ -31,7 +31,7 @@ function authRouter(root) {
 
   /**
    * @description 임시 비밀번호 발급
-   * @routes POST /auth/temppwd
+   * @routes POST /auth/temp
    */
   router.post("/temp", valid.auth.post_temp, ctrl.auth.post_temp);
 }
