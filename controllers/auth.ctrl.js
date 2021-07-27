@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
+const profileDefault = "https://broombroom.s3.ap-northeast-2.amazonaws.com/broomProfile-default.png";
+
 exports.post_signup = async (req, res, next) => {
   const { email, nickname, name, password, confirm_pwd, phoneNumber } = req.body;
   try {
@@ -24,7 +26,7 @@ exports.post_signup = async (req, res, next) => {
               password: hash,
               phoneNumber,
               UserAddresses: [{ addressScope: 0, neighborhoods: "826", districtId: 826 }],
-              ProfileImages: [{ profileImageURI: "broomProfile-default.png" }],
+              ProfileImages: [{ profileImageURI: profileDefault }],
             },
             { include: [{ model: model.UserAddress }, { model: model.ProfileImage }] }
           );
