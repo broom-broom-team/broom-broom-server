@@ -3,12 +3,21 @@ const multerS3 = require("multer-s3");
 
 const s3 = require("../config/s3.config");
 
-const storage = multerS3({
+const profilestorage = multerS3({
   s3: s3,
   bucket: "broombroom",
   key: (req, file, done) => {
     const extension = file.mimetype.split("/")[1];
     done(null, "broomProfile-" + Date.now() + "." + extension);
+  },
+});
+
+const postStorage = multerS3({
+  s3: s3,
+  bucket: "broombroom",
+  key: (req, file, done) => {
+    const extension = file.mimetype.split("/")[1];
+    done(null, "broomPost-" + Date.now() + "." + extension);
   },
 });
 
@@ -21,4 +30,5 @@ const fileFilter = (req, file, done) => {
   }
 };
 
-exports.profileUpload = multer({ storage, fileFilter });
+exports.profileUpload = multer({ storage: profilestorage, fileFilter });
+exports.postUpload = multer({ storage: postStorage, fileFilter });

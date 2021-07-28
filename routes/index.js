@@ -2,12 +2,14 @@ const { Router } = require("express");
 const authRouter = require("./auth.router");
 const addressRouter = require("./address.router");
 const userRouter = require("./user.router");
+const postRouter = require("./post.router");
 const rootRouter = Router();
 
 function router() {
   authRouter(rootRouter);
   addressRouter(rootRouter);
   userRouter(rootRouter);
+  postRouter(rootRouter);
 
   return rootRouter;
 }

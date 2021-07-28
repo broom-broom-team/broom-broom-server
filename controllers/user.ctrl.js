@@ -6,12 +6,12 @@ const profileDefault = "https://broombroom.s3.ap-northeast-2.amazonaws.com/broom
 exports.get_user = async (req, res, next) => {
   try {
     const user = await model.User.findOne({ include: [{ model: model.ProfileImage }], where: { id: req.user.id } });
-    const userAdderss = await model.UserAddress.findOne({ include: [{ model: model.District }] }, { where: { userId: req.user.id } });
+    const userAddress = await model.UserAddress.findOne({ include: [{ model: model.District }] }, { where: { userId: req.user.id } });
     const mypage = {
       nickname: user.nickname,
       mannerPoint: user.mannerPoint.toFixed(2),
       cash: user.cash.toLocaleString() + "P",
-      simpleAddress: userAdderss.District.simpleAddress,
+      simpleAddress: userAddress.District.simpleAddress,
       profileImageURI: user.ProfileImages[0].profileImageURI,
     };
     return res.status(200).json({ success: true, message: "마이페이지 유저정보를 불러옵니다.", mypage });

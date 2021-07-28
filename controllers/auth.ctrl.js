@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
+const profileDefault = "https://broombroom.s3.ap-northeast-2.amazonaws.com/broomProfile-default.png";
+
 exports.post_signup = async (req, res, next) => {
   const { email, nickname, name, password, confirm_pwd, phoneNumber } = req.body;
   try {
@@ -16,7 +18,7 @@ exports.post_signup = async (req, res, next) => {
       } else {
         if (password == confirm_pwd) {
           const hash = await bcrypt.hash(password, await bcrypt.genSalt(12));
-          const user = await model.User.create(
+          await model.User.create(
             {
               email,
               nickname,
@@ -24,12 +26,10 @@ exports.post_signup = async (req, res, next) => {
               password: hash,
               phoneNumber,
               UserAddresses: [{ addressScope: 0, neighborhoods: "826", districtId: 826 }],
-              ProfileImages: [{ profileImageURI: "broomProfile-default.png" }],
+              ProfileImages: [{ profileImageURI: profileDefault }],
             },
             { include: [{ model: model.UserAddress }, { model: model.ProfileImage }] }
           );
-          // 초기 주소 설정 => 인천 송도 1동 (districts.id is 826)
-          // await model.UserAddress.create({ addressScope: 0, neighborhoods: "826", districtId: 826, userId: user.id });
           return res.status(200).json({ success: true, message: "회원가입이 완료되었습니다." });
         } else {
           return res.status(400).json({ success: false, message: "비밀번호가 틀렸습니다. 다시 입력해 주세요." });
