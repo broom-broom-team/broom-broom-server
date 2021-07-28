@@ -17,7 +17,8 @@ const postStorage = multerS3({
   bucket: "broombroom",
   key: (req, file, done) => {
     const extension = file.mimetype.split("/")[1];
-    done(null, "broomPost-" + Date.now() + "." + extension);
+    const randomNumber = Math.floor(Math.random() * 999);
+    done(null, "broomPost-" + Date.now() + "-" + randomNumber + "." + extension);
   },
 });
 

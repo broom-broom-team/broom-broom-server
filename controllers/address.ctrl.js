@@ -6,12 +6,11 @@ const Op = Sequelize.Op;
 exports.get_address = async (req, res, next) => {
   try {
     const userAddress = await model.UserAddress.findOne({ where: { userId: req.user.id }, include: { model: model.District } });
-    console.log(userAddress);
     return res.status(200).json({
       success: true,
       message: "회원의 기준지역과 활동범위를 반환합니다.",
-      simpleAddress: userAddress.addressScope,
-      addressScope: userAddress.District.simpleAddress,
+      simpleAddress: userAddress.District.simpleAddress,
+      addressScope: userAddress.addressScope,
     });
   } catch (e) {
     return next(e);
@@ -112,8 +111,9 @@ exports.post_address = async (req, res, next) => {
     conn.release();
     let neighborhoods = new String();
     for (let i = 0; i < districts.length; i++) {
-      neighborhoods += districts[i].id + " ";
+      neighborhoods += districts[i].id + ",";
     }
+    neighborhoods = neighborhoods.slice(0, -1);
     await model.UserAddress.update({ neighborhoods, addressScope }, { where: { userId: req.user.id } });
     return res.status(200).json({ success: true, message: "활동지역 설정이 완료되었습니다." });
   } catch (e) {

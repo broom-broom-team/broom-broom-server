@@ -55,10 +55,10 @@ exports.post_point = (req, res, next) => {
   // 환급하려는 포인트는 1000원이상부터 가능하다.
   // type에 따라 필수로 입력해야하는 값이 있다. => 충전: chargeAmount, 환급: refundAmount, bankName, account
   const type = req.params.type;
-  if (type == "refund") {
-    const { refundAmount } = req.body;
-    if (refundAmount) {
-      if (amount_regex.test(refundAmount)) {
+  if (type == "charge") {
+    const { chargeAmount } = req.body;
+    if (chargeAmount) {
+      if (amount_regex.test(chargeAmount)) {
         next();
       } else {
         return res.status(400).json({ success: false, message: "충전하실 금액은 숫자만 입력가능합니다." });
@@ -67,15 +67,15 @@ exports.post_point = (req, res, next) => {
       return res.status(400).json({ success: false, message: "충전하실 금액을 입력해주세요." });
     }
   } else {
-    const { chargeAmount, bankName, account } = req.body;
-    if (chargeAmount && bankName && account) {
-      if (amount_regex.test(chargeAmount)) {
+    const { refundAmount, bankName, account } = req.body;
+    if (refundAmount && bankName && account) {
+      if (amount_regex.test(refundAmount)) {
         next();
       } else {
-        return res.status(400).json({ success: false, message: "충전하실 금액은 숫자만 입력가능합니다." });
+        return res.status(400).json({ success: false, message: "환급하실 금액은 숫자만 입력가능합니다." });
       }
     } else {
-      return res.status(400).json({ success: false, message: "환급받을 계좌의 정보를 모두 입력해주세요." });
+      return res.status(400).json({ success: false, message: "환급받을 계좌의 정보를 모두 정확히 입력해주세요." });
     }
   }
 };
