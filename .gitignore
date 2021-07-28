@@ -112,4 +112,5 @@ sql.js
 /pool.js
 todo.txt
 geojson_insert.js
+geojson_parser.js
 ex.geojson
