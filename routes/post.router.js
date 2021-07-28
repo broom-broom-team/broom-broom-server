@@ -12,7 +12,7 @@ function postRouter(root) {
    * @description 심부름 등록하기
    * @routes POST /post
    */
-  router.post("/", middleware.user.postUpload.array("images", 8), valid.post.post_post, ctrl.post.post_post);
+  router.post("/", middleware.upload.postUpload.array("images", 8), valid.post.post_post, ctrl.post.post_post);
 }
 
 module.exports = postRouter;

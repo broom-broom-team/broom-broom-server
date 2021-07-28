@@ -1,4 +1,4 @@
 const auth = require("../middlewares/auth.middleware");
-const user = require("../middlewares/user.middleware");
+const upload = require("./upload.middleware");
 
-module.exports = { auth, user };
+module.exports = { auth, upload };
