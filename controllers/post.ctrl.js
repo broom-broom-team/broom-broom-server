@@ -30,3 +30,39 @@ exports.post_post = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.get_post = async (req, res, next) => {
+  const postId = req.params.id;
+  try {
+    const post = await model.Post.findOne({
+      include: [{ model: model.PostImage }, { model: model.District }, { model: model.User, include: [{ model: model.ProfileImage }] }],
+      where: { id: postId },
+    });
+    const userAddress = await model.UserAddress.findOne({ include: [{ model: model.District }] }, { where: { userId: post.sellerId } });
+    const sellCount = await model.Post.count({ where: { status: "end", sellerId: post.sellerId } });
+    const buyCount = await model.Post.count({ where: { status: "end", buyerId: post.sellerId } });
+    const postInfo = {
+      title: post.title,
+      description: post.description,
+      status: post.status,
+      price: post.price,
+      requiredTime: post.requiredTime,
+      deadline: post.deadline,
+      createdAt: post.createdAt,
+      sellingDistrict: post.District.simpleAddress,
+      postImages: post.PostImages[0].postImageURI.split(","),
+    };
+    const sellerInfo = {
+      nickname: post.User.nickname,
+      mannerPoint: post.User.mannerPoint,
+      createdAt: post.User.createdAt,
+      profileImages: post.User.ProfileImages[0].profileImageURI,
+      simpleAddress: userAddress.District.simpleAddress,
+      sellCount,
+      buyCount,
+    };
+    return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo });
+  } catch (e) {
+    return next(e);
+  }
+};
