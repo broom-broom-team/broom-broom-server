@@ -13,6 +13,12 @@ function postRouter(root) {
    * @routes POST /post
    */
   router.post("/", middleware.upload.postUpload.array("images", 8), valid.post.post_post, ctrl.post.post_post);
+
+  /**
+   * @description 심부름 상세보기
+   * @routes GET /post/:id
+   */
+  router.get("/:id", ctrl.post.get_post);
 }
 
 module.exports = postRouter;
