@@ -48,5 +48,9 @@ function userRouter(root) {
    * @routes POST /user/point/:type
    */
   router.post("/point/:type", valid.user.post_point, ctrl.user.post_point);
+
+  /**
+   * @TODO 회원탈퇴, 로그아웃
+   */
 }
 module.exports = userRouter;

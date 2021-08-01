@@ -24,7 +24,7 @@ exports.post_post = async (req, res, next) => {
       );
       return res.status(200).json({ success: true, message: "심부름 등록이 완료되었습니다." });
     } else {
-      return res.status(400).json({ success: true, message: "회원님의 주소를 찾을 수 없는 에러가 발생하였습니다." });
+      return res.status(400).json({ success: false, message: "회원님의 주소를 찾을 수 없는 에러가 발생하였습니다." });
     }
   } catch (e) {
     return next(e);
@@ -37,11 +37,16 @@ exports.get_post = async (req, res, next) => {
     const post = await model.Post.findOne({
       include: [{ model: model.PostImage }, { model: model.District }, { model: model.User, include: [{ model: model.ProfileImage }], paranoid: false }],
       where: { id: postId },
+      paranoid: false,
     });
+    if (post.deletedAt) {
+      return res.status(400).json({ success: false, message: "삭제된 심부름입니다." });
+    }
     const userAddress = await model.UserAddress.findOne({ include: [{ model: model.District }] }, { where: { userId: post.sellerId } });
     const sellCount = await model.Post.count({ where: { status: "end", sellerId: post.sellerId } });
     const buyCount = await model.Post.count({ where: { status: "end", buyerId: post.sellerId } });
     const postInfo = {
+      id: post.id,
       title: post.title,
       description: post.description,
       status: post.status,
@@ -63,7 +68,7 @@ exports.get_post = async (req, res, next) => {
       buyCount,
     };
     if (post.User.deletedAt) {
-      return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo: undefined });
+      return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo: "탈퇴한 회원" });
     } else {
       return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo });
     }
