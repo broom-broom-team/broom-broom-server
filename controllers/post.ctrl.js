@@ -76,3 +76,25 @@ exports.get_post = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.delete_post = async (req, res, next) => {
+  const postId = req.params.id;
+  try {
+    const post = await model.Post.findOne({ where: { id: postId }, paranoid: false });
+    if (post.deletedAt) {
+      return res.status(400).json({ success: false, message: "이미 삭제된 게시글 입니다." });
+    }
+    if (post.sellerId === req.user.id) {
+      if (!post.buyerId) {
+        await model.Post.destroy({ where: { id: postId } });
+        return res.status(200).json({ success: true, message: "삭제가 완료되었습니다." });
+      } else {
+        return res.status(400).json({ success: false, message: "약속이 확정된 이후에는 삭제할 수 없습니다." });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "해당 심부름 작성자가 아닙니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};

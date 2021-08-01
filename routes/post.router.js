@@ -19,6 +19,12 @@ function postRouter(root) {
    * @routes GET /post/:id
    */
   router.get("/:id", ctrl.post.get_post);
+
+  /**
+   * @description 심부름 삭제하기
+   * @routes DELETE /post/:id
+   */
+  router.delete("/:id", ctrl.post.delete_post);
 }
 
 module.exports = postRouter;
