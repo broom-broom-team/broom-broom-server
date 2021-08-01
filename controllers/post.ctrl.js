@@ -98,3 +98,30 @@ exports.delete_post = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.get_edit = async (req, res, next) => {
+  const postId = req.params.id;
+  try {
+    const post = await model.Post.findOne({ where: { id: postId }, include: [{ model: model.PostImage }] });
+    const editpage = {
+      id: post.id,
+      title: post.title,
+      description: post.description,
+      price: post.price,
+      requiredTime: post.requiredTime,
+      deadline: post.deadline,
+      postImages: post.PostImages[0].postImageURI != postDefault ? post.PostImages[0].postImageURI.split(",") : "현재 등록된 게시글 사진이 없습니다.",
+    };
+    if (post.sellerId === req.user.id) {
+      if (post.status === "basic") {
+        return res.status(200).json({ success: true, message: "심부름 수정을 위한 심부름 정보를 불러옵니다.", editpage });
+      } else {
+        return res.status(400).json({ success: false, message: "심부름이 마감되었거나 약속확정 이후에는 수정할 수 없습니다." });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "해당 심부름 작성자가 아닙니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
