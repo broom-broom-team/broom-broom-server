@@ -49,6 +49,7 @@ exports.get_post = async (req, res, next) => {
       requiredTime: post.requiredTime,
       deadline: post.deadline,
       createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
       sellingDistrict: post.District.simpleAddress,
       postImages: post.PostImages[0].postImageURI.split(","),
     };
