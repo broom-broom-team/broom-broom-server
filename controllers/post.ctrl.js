@@ -35,7 +35,7 @@ exports.get_post = async (req, res, next) => {
   const postId = req.params.id;
   try {
     const post = await model.Post.findOne({
-      include: [{ model: model.PostImage }, { model: model.District }, { model: model.User, include: [{ model: model.ProfileImage }] }],
+      include: [{ model: model.PostImage }, { model: model.District }, { model: model.User, include: [{ model: model.ProfileImage }], paranoid: false }],
       where: { id: postId },
     });
     const userAddress = await model.UserAddress.findOne({ include: [{ model: model.District }] }, { where: { userId: post.sellerId } });
@@ -62,7 +62,11 @@ exports.get_post = async (req, res, next) => {
       sellCount,
       buyCount,
     };
-    return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo });
+    if (post.User.deletedAt) {
+      return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo: undefined });
+    } else {
+      return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo });
+    }
   } catch (e) {
     return next(e);
   }
