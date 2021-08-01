@@ -125,3 +125,35 @@ exports.get_edit = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.post_edit = async (req, res, next) => {
+  const postId = req.params.id;
+  const { title, description, price, deadline, requiredTime } = req.body;
+  try {
+    // TODO: 기존에 있던 사진 지울지 말지 결정하기
+    const images = req.files;
+    const imagesURI = images.length != 0 ? images.map((img) => img.location) : postDefault;
+    const postImageURI = imagesURI.toString();
+    const userAddress = await model.UserAddress.findOne({ where: { userId: req.user.id } });
+    if (userAddress) {
+      await model.Post.update(
+        {
+          title,
+          description,
+          price,
+          deadline,
+          requiredTime,
+          sellerId: req.user.id,
+          sellingDistrict: userAddress.districtId,
+        },
+        { where: { id: postId } }
+      );
+      await model.PostImage.update({ postImageURI }, { where: { postId } });
+      return res.status(200).json({ success: true, message: "심부름 수정이 완료되었습니다." });
+    } else {
+      return res.status(400).json({ success: false, message: "회원님의 주소를 찾을 수 없는 에러가 발생하였습니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};

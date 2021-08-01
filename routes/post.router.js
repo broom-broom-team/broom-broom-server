@@ -31,6 +31,12 @@ function postRouter(root) {
    * @routes GET /post/edit/:id
    */
   router.get("/edit/:id", ctrl.post.get_edit);
+
+  /**
+   * @description 심부름 수정하기
+   * @routes POST /post/edit/:id
+   */
+  router.post("/edit/:id", middleware.upload.postUpload.array("images", 8), valid.post.post_post, ctrl.post.post_edit);
 }
 
 module.exports = postRouter;
