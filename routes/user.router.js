@@ -48,5 +48,17 @@ function userRouter(root) {
    * @routes POST /user/point/:type
    */
   router.post("/point/:type", valid.user.post_point, ctrl.user.post_point);
+
+  /**
+   * @description 회원탈퇴하기
+   * @routes DELETE /user/delete
+   */
+  router.delete("/delete", ctrl.user.delete_user);
+
+  /**
+   * @description 로그아웃
+   * @routes GET /user/logout
+   */
+  router.get("/logout", ctrl.user.get_logout);
 }
 module.exports = userRouter;

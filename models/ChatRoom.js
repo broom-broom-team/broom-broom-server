@@ -12,7 +12,7 @@ module.exports = class ChatRoom extends Sequelize.Model {
         underscored: false,
         modelName: "ChatRoom",
         tableName: "chatRooms",
-        paranoid: false,
+        paranoid: true,
         charset: "utf8mb4",
         collate: "utf8mb4_general_ci",
       }

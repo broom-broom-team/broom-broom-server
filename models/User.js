@@ -16,7 +16,6 @@ module.exports = class User extends Sequelize.Model {
         email: {
           type: Sequelize.STRING(40),
           allowNull: false,
-          unique: true,
         },
         password: {
           type: Sequelize.STRING(255),
@@ -25,12 +24,10 @@ module.exports = class User extends Sequelize.Model {
         nickname: {
           type: Sequelize.STRING(10),
           allowNull: false,
-          unique: true,
         },
         phoneNumber: {
           type: Sequelize.STRING(15),
           allowNull: false,
-          unique: true,
         },
         mannerPoint: {
           type: Sequelize.FLOAT,
@@ -49,7 +46,7 @@ module.exports = class User extends Sequelize.Model {
         underscored: false,
         modelName: "User",
         tableName: "users",
-        paranoid: false,
+        paranoid: true,
         charset: "utf8mb4",
         collate: "utf8mb4_general_ci",
       }

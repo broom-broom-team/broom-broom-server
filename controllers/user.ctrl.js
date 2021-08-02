@@ -162,3 +162,29 @@ exports.post_point = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.delete_user = async (req, res, next) => {
+  const { password } = req.body;
+  try {
+    const user = await model.User.findByPk(req.user.id);
+    const passwordCheck = await bcrypt.compare(password, user.password);
+    if (passwordCheck) {
+      await model.User.destroy({ where: { id: req.user.id } });
+      // redirect: 로그인페이지로
+      return res.status(200).json({ success: true, message: "회원탈퇴가 완료되었습니다. 복구하길 원한다면 30일내로 문의메일 주시면 됩니다." });
+    } else {
+      return res.status(400).json({ success: false, message: "비밀번호가 일치하지 않습니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.get_logout = async (req, res, next) => {
+  try {
+    req.logout();
+    return res.status(200).json({ success: true, message: "로그아웃 완료. 로그인페이지로 넘어갑니다." });
+  } catch (e) {
+    return next(e);
+  }
+};
