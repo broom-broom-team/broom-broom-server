@@ -2,8 +2,7 @@ exports.isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    // TODO: redirect("/login")으로 바꿀 예정 => 어차피 로그인 토큰은 무기한으로 줄 것 이라 로그아웃하지 않는 이상 로그인 유지되어 있을거임.
-    // 로그아웃 버튼 클릭시 로그인 페이지로 이동
+    // redirect: 로그인페이지로
     return res.status(401).json({ success: false, message: "다시 로그인이 필요합니다." });
   }
 };
