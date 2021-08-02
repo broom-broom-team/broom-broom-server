@@ -179,3 +179,12 @@ exports.delete_user = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.get_logout = async (req, res, next) => {
+  try {
+    req.logout();
+    return res.status(200).json({ success: true, message: "로그아웃 완료. 로그인페이지로 넘어갑니다." });
+  } catch (e) {
+    return next(e);
+  }
+};

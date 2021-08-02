@@ -54,5 +54,11 @@ function userRouter(root) {
    * @routes DELETE /user/delete
    */
   router.delete("/delete", ctrl.user.delete_user);
+
+  /**
+   * @description 로그아웃
+   * @routes GET /user/logout
+   */
+  router.get("/logout", ctrl.user.get_logout);
 }
 module.exports = userRouter;
