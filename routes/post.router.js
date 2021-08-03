@@ -43,6 +43,12 @@ function postRouter(root) {
    * @routes GET /post/history/me
    */
   router.get("/history/me", ctrl.post.get_history_me);
+
+  /**
+   * @description 이용 내역
+   * @routes GET /post/history/all
+   */
+  router.get("/history/all", ctrl.post.get_history_all);
 }
 
 module.exports = postRouter;
