@@ -54,7 +54,7 @@ function postRouter(root) {
    * @description 부르미에게 평점 등록
    * @routes POST /post/review/:id
    */
-  router.post("/review/:id", ctrl.post.post_review);
+  router.post("/review/:id", valid.post.post_review, ctrl.post.post_review);
 }
 
 module.exports = postRouter;

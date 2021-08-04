@@ -83,4 +83,11 @@ exports.post_post = (req, res, next) => {
   }
 };
 
-exports.post_review = (req, res, next) => {};
+exports.post_review = (req, res, next) => {
+  const { reviewPoint } = req.body;
+  if (reviewPoint >= 0 && reviewPoint <= 5) {
+    next();
+  } else {
+    return res.status(400).json({ success: false, message: "리뷰점수는 0~5점까지만 가능합니다." });
+  }
+};
