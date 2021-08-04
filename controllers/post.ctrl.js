@@ -1,4 +1,5 @@
 const model = require("../models");
+const Sequelize = require("sequelize");
 const postDefault = "https://broombroom.s3.ap-northeast-2.amazonaws.com/broomPost-default.png";
 
 exports.post_post = async (req, res, next) => {
@@ -152,6 +153,116 @@ exports.post_edit = async (req, res, next) => {
       return res.status(200).json({ success: true, message: "심부름 수정이 완료되었습니다." });
     } else {
       return res.status(400).json({ success: false, message: "회원님의 주소를 찾을 수 없는 에러가 발생하였습니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.get_history_me = async (req, res, next) => {
+  try {
+    const posts = await model.Post.findAll({
+      where: { sellerId: req.user.id },
+      order: [["updatedAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      include: [
+        { model: model.District, attributes: ["simpleAddress"] },
+        { model: model.PostImage, attributes: ["postImageURI"] },
+      ],
+    });
+    if (posts.length === 0) {
+      return res.status(200).json({ success: true, message: "아직 작성한 심부름이 없습니다." });
+    } else {
+      const history = [];
+      for (let i = 0; i < posts.length; i++) {
+        let postImageURI = posts[i].PostImages[0].postImageURI.split(",");
+        let post = {
+          id: posts[i].id,
+          title: posts[i].title,
+          deadline: posts[i].deadline,
+          requiredTime: posts[i].requiredTime,
+          updatedAt: posts[i].updatedAt,
+          price: posts[i].price,
+          status: posts[i].status,
+          simpleAddress: posts[i].District.simpleAddress,
+          thumbnail: postImageURI[0],
+        };
+        history.push(post);
+      }
+      return res.status(200).json({ success: true, message: "내가 작성한 심부름을 불러옵니다.", history });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.get_history_all = async (req, res, next) => {
+  const Op = Sequelize.Op;
+  try {
+    // await model.Review.create({ point: 3, registerId: 3, postId: 5 });
+    const sellerPosts = await model.Post.findAll({
+      where: { sellerId: req.user.id, [Op.or]: [{ status: "proceed" }, { status: "end" }] },
+      order: [["updatedAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      include: [
+        { model: model.District, attributes: ["simpleAddress"] },
+        { model: model.PostImage, attributes: ["postImageURI"] },
+        { model: model.Review, attributes: ["point"] },
+      ],
+    });
+    const buyerPosts = await model.Post.findAll({
+      where: { buyerId: req.user.id },
+      order: [["updatedAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      include: [
+        { model: model.District, attributes: ["simpleAddress"] },
+        { model: model.PostImage, attributes: ["postImageURI"] },
+        { model: model.Review, attributes: ["point"] },
+      ],
+    });
+    if (sellerPosts.length === 0 && buyerPosts.length === 0) {
+      return res.status(200).json({ success: true, message: "아직 이용한 심부름이 없습니다." });
+    } else {
+      const buyerUsage = [];
+      const sellerProceed = [];
+      const sellerEnd = [];
+      for (let i = 0; i < buyerPosts.length; i++) {
+        let postImageURI = buyerPosts[i].PostImages[0].postImageURI.split(",");
+        let post = {
+          id: buyerPosts[i].id,
+          title: buyerPosts[i].title,
+          deadline: buyerPosts[i].deadline,
+          requiredTime: buyerPosts[i].requiredTime,
+          updatedAt: buyerPosts[i].updatedAt,
+          price: buyerPosts[i].price,
+          status: buyerPosts[i].status,
+          simpleAddress: buyerPosts[i].District.simpleAddress,
+          thumbnail: postImageURI[0],
+          review: buyerPosts[i].Reviews[0] ? buyerPosts[i].Reviews[0].point : null,
+        };
+        buyerUsage.push(post);
+      }
+      for (let i = 0; i < sellerPosts.length; i++) {
+        let postImageURI = sellerPosts[i].PostImages[0].postImageURI.split(",");
+        let post = {
+          id: sellerPosts[i].id,
+          title: sellerPosts[i].title,
+          deadline: sellerPosts[i].deadline,
+          requiredTime: sellerPosts[i].requiredTime,
+          updatedAt: sellerPosts[i].updatedAt,
+          price: sellerPosts[i].price,
+          status: sellerPosts[i].status,
+          simpleAddress: sellerPosts[i].District.simpleAddress,
+          thumbnail: postImageURI[0],
+        };
+        if (post.status === "proceed") {
+          sellerProceed.push(post);
+        }
+        if (post.status === "end") {
+          (post.review = sellerPosts[i].Reviews[0] ? sellerPosts[i].Reviews[0].point : null), sellerEnd.push(post);
+        }
+      }
+      return res.status(200).json({ success: true, message: "내가 이용한 심부름을 불러옵니다.", buyerUsage, sellerProceed, sellerEnd });
     }
   } catch (e) {
     return next(e);

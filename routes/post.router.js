@@ -37,6 +37,18 @@ function postRouter(root) {
    * @routes POST /post/edit/:id
    */
   router.post("/edit/:id", middleware.upload.postUpload.array("images", 8), valid.post.post_post, ctrl.post.post_edit);
+
+  /**
+   * @description 내가 등록한 심부름 확인
+   * @routes GET /post/history/me
+   */
+  router.get("/history/me", ctrl.post.get_history_me);
+
+  /**
+   * @description 이용 내역
+   * @routes GET /post/history/all
+   */
+  router.get("/history/all", ctrl.post.get_history_all);
 }
 
 module.exports = postRouter;
