@@ -296,3 +296,5 @@ exports.post_review = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.get_search = async (req, res, next) => {};

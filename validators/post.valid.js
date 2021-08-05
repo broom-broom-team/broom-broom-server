@@ -1,5 +1,6 @@
 const title_regex = /^.{4,40}$/;
 const description_regex = /^.{8,400}$/;
+const name_regex = /^.{1,20}$/;
 const now = Date.now();
 const s3 = require("../config/s3.config");
 
@@ -89,5 +90,15 @@ exports.post_review = (req, res, next) => {
     next();
   } else {
     return res.status(400).json({ success: false, message: "리뷰점수는 0~5점까지만 가능합니다." });
+  }
+};
+
+exports.get_search = (req, res, next) => {
+  let { name } = req.query;
+  name = name.trim();
+  if (name_regex.test(name)) {
+    next();
+  } else {
+    return res.status(400).json({ success: false, message: "검색 키워드는 1~20글자만 입력가능합니다." });
   }
 };
