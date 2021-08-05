@@ -18,7 +18,7 @@ function postRouter(root) {
    * @description 심부름 상세보기
    * @routes GET /post/:id
    */
-  router.get("/:id", ctrl.post.get_post);
+  router.get("/detail/:id", ctrl.post.get_post);
 
   /**
    * @description 심부름 삭제하기
@@ -49,6 +49,12 @@ function postRouter(root) {
    * @routes GET /post/history/all
    */
   router.get("/history/all", ctrl.post.get_history_all);
+
+  /**
+   * @description 부르미에게 평점 등록
+   * @routes POST /post/review/:id
+   */
+  router.post("/review/:id", valid.post.post_review, ctrl.post.post_review);
 }
 
 module.exports = postRouter;

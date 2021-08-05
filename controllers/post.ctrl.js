@@ -254,6 +254,7 @@ exports.get_history_all = async (req, res, next) => {
           status: sellerPosts[i].status,
           simpleAddress: sellerPosts[i].District.simpleAddress,
           thumbnail: postImageURI[0],
+          buyerId: sellerPosts[i].buyerId, // 평점이 들어갈 구매자
         };
         if (post.status === "proceed") {
           sellerProceed.push(post);
@@ -263,6 +264,33 @@ exports.get_history_all = async (req, res, next) => {
         }
       }
       return res.status(200).json({ success: true, message: "내가 이용한 심부름을 불러옵니다.", buyerUsage, sellerProceed, sellerEnd });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.post_review = async (req, res, next) => {
+  const postId = req.params.id;
+  const { reviewPoint } = req.body;
+  try {
+    const post = await model.Post.findOne({
+      where: { id: postId },
+      include: { model: model.Review, attributes: ["point"] },
+    });
+    if (post.Reviews[0]) {
+      return res.status(400).json({ success: false, message: "이미 리뷰작성을 완료한 심부름입니다." });
+    } else {
+      if (post.sellerId === req.user.id && post.buyerId !== req.user.id) {
+        if (post.status === "end") {
+          await model.Review.create({ registerId: post.sellerId, postId: post.id, point: reviewPoint });
+          return res.status(200).json({ success: true, message: "리뷰작성이 완료되었습니다." });
+        } else {
+          return res.status(400).json({ success: false, message: "아직 완료되지 않은 심부름입니다." });
+        }
+      } else {
+        return res.status(400).json({ success: false, message: "리뷰작성 대상자가 아닙니다." });
+      }
     }
   } catch (e) {
     return next(e);
