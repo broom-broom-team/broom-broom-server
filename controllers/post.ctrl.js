@@ -163,8 +163,8 @@ exports.get_history_me = async (req, res, next) => {
   try {
     const posts = await model.Post.findAll({
       where: { sellerId: req.user.id },
-      order: [["updatedAt", "DESC"]],
-      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
       include: [
         { model: model.District, attributes: ["simpleAddress"] },
         { model: model.PostImage, attributes: ["postImageURI"] },
@@ -182,6 +182,7 @@ exports.get_history_me = async (req, res, next) => {
           deadline: posts[i].deadline,
           requiredTime: posts[i].requiredTime,
           updatedAt: posts[i].updatedAt,
+          createdAt: posts[i].createdAt,
           price: posts[i].price,
           status: posts[i].status,
           simpleAddress: posts[i].District.simpleAddress,
@@ -202,8 +203,8 @@ exports.get_history_all = async (req, res, next) => {
     // await model.Review.create({ point: 3, registerId: 3, postId: 5 });
     const sellerPosts = await model.Post.findAll({
       where: { sellerId: req.user.id, [Op.or]: [{ status: "proceed" }, { status: "end" }] },
-      order: [["updatedAt", "DESC"]],
-      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
       include: [
         { model: model.District, attributes: ["simpleAddress"] },
         { model: model.PostImage, attributes: ["postImageURI"] },
@@ -212,8 +213,8 @@ exports.get_history_all = async (req, res, next) => {
     });
     const buyerPosts = await model.Post.findAll({
       where: { buyerId: req.user.id },
-      order: [["updatedAt", "DESC"]],
-      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
       include: [
         { model: model.District, attributes: ["simpleAddress"] },
         { model: model.PostImage, attributes: ["postImageURI"] },
@@ -234,6 +235,7 @@ exports.get_history_all = async (req, res, next) => {
           deadline: buyerPosts[i].deadline,
           requiredTime: buyerPosts[i].requiredTime,
           updatedAt: buyerPosts[i].updatedAt,
+          createdAt: buyerPosts[i].createdAt,
           price: buyerPosts[i].price,
           status: buyerPosts[i].status,
           simpleAddress: buyerPosts[i].District.simpleAddress,
@@ -250,6 +252,7 @@ exports.get_history_all = async (req, res, next) => {
           deadline: sellerPosts[i].deadline,
           requiredTime: sellerPosts[i].requiredTime,
           updatedAt: sellerPosts[i].updatedAt,
+          createdAt: sellerPosts[i].createdAt,
           price: sellerPosts[i].price,
           status: sellerPosts[i].status,
           simpleAddress: sellerPosts[i].District.simpleAddress,
@@ -305,7 +308,7 @@ exports.get_search = async (req, res, next) => {
     const contentSize = 20;
     const firstIndex = (page - 1) * contentSize;
     const lastIndex = page * contentSize - 1;
-    const orderTarget = req.query.order ? req.query.order : "updatedAt";
+    const orderTarget = req.query.order ? req.query.order : "createdAt";
     const orderMethod = orderTarget === "deadline" ? "ASC" : "DESC";
     const postFilter = Number(req.query.filter) ? "basic" : model.Post.rawAttributes.status.values;
     const searchPosts = [];
@@ -327,7 +330,7 @@ exports.get_search = async (req, res, next) => {
         ],
       },
       order: [[orderTarget, orderMethod]],
-      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
       include: [
         { model: model.District, attributes: ["simpleAddress"] },
         { model: model.PostImage, attributes: ["postImageURI"] },
@@ -352,7 +355,7 @@ exports.get_search = async (req, res, next) => {
           ],
         },
         order: [[orderTarget, orderMethod]],
-        attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+        attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
         include: [
           { model: model.District, attributes: ["simpleAddress"] },
           { model: model.PostImage, attributes: ["postImageURI"] },
@@ -366,6 +369,7 @@ exports.get_search = async (req, res, next) => {
           deadline: postsInContent[i].deadline,
           requiredTime: postsInContent[i].requiredTime,
           updatedAt: postsInContent[i].updatedAt,
+          createdAt: postsInContent[i].createdAt,
           price: postsInContent[i].price,
           status: postsInContent[i].status,
           simpleAddress: postsInContent[i].District.simpleAddress,
@@ -385,6 +389,7 @@ exports.get_search = async (req, res, next) => {
           deadline: postsInTitle[i].deadline,
           requiredTime: postsInTitle[i].requiredTime,
           updatedAt: postsInTitle[i].updatedAt,
+          createdAt: postsInTitle[i].createdAt,
           price: postsInTitle[i].price,
           status: postsInTitle[i].status,
           simpleAddress: postsInTitle[i].District.simpleAddress,
