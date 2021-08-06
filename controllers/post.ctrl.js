@@ -300,15 +300,18 @@ exports.post_review = async (req, res, next) => {
 exports.get_search = async (req, res, next) => {
   const Op = Sequelize.Op;
   try {
-    let { name, page } = req.query;
-    page = page ? page : 1;
-    name = name.trim();
-    let nameWords = name.split(" ");
+    const { name } = req.query;
+    const page = Number(req.query.page) ? Number(req.query.page) : 1;
+    const contentSize = 20;
+    const firstIndex = (page - 1) * contentSize;
+    const lastIndex = page * contentSize - 1;
+    const searchPosts = [];
+    name.trim();
+    const nameWords = name.split(" ");
     let nameWord = "";
     for (let i = 0; i < nameWords.length; i++) {
       nameWord += nameWords[i];
     }
-    const resultPosts = [];
     const postsInTitle = await model.Post.findAll({
       where: {
         [Op.or]: [
@@ -327,7 +330,7 @@ exports.get_search = async (req, res, next) => {
       ],
     });
     if (postsInTitle.length <= 5) {
-      // 검색 결과가 적어 내용에서도 찾아냅니다.
+      // 제목만으로 검색 결과가 적어 내용에서도 찾아냅니다.
       const postsInContent = await model.Post.findAll({
         where: {
           [Op.or]: [
@@ -364,11 +367,11 @@ exports.get_search = async (req, res, next) => {
           thumbnail: postImageURI[0],
           buyerId: postsInContent[i].buyerId, // 평점이 들어갈 구매자
         };
-        resultPosts.push(post);
+        searchPosts.push(post);
       }
-      return res.status(200).json({ success: true, message: "심부름 제목과 내용을 고려하여 게시글들을 검색합니다.", resultPosts });
+      const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
+      return res.status(200).json({ success: true, message: "심부름 제목과 내용을 고려하여 게시글들을 검색합니다.", pagingPosts });
     } else {
-      // TODO 가공후에 resultPost배열에 푸시
       for (let i = 0; i < postsInTitle.length; i++) {
         let postImageURI = postsInTitle[i].PostImages[0].postImageURI.split(",");
         let post = {
@@ -383,9 +386,10 @@ exports.get_search = async (req, res, next) => {
           thumbnail: postImageURI[0],
           buyerId: postsInTitle[i].buyerId, // 평점이 들어갈 구매자
         };
-        resultPosts.push(post);
+        searchPosts.push(post);
       }
-      return res.status(200).json({ success: true, message: "심부름 제목만으로 게시글들을 검색합니다.", resultPosts });
+      const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
+      return res.status(200).json({ success: true, message: "심부름 제목만으로 게시글들을 검색합니다.", pagingPosts });
     }
   } catch (e) {
     return next(e);
