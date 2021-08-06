@@ -297,4 +297,97 @@ exports.post_review = async (req, res, next) => {
   }
 };
 
-exports.get_search = async (req, res, next) => {};
+exports.get_search = async (req, res, next) => {
+  const Op = Sequelize.Op;
+  try {
+    let { name, page } = req.query;
+    page = page ? page : 1;
+    name = name.trim();
+    let nameWords = name.split(" ");
+    let nameWord = "";
+    for (let i = 0; i < nameWords.length; i++) {
+      nameWord += nameWords[i];
+    }
+    const resultPosts = [];
+    const postsInTitle = await model.Post.findAll({
+      where: {
+        [Op.or]: [
+          {
+            title: { [Op.like]: "%" + name + "%" },
+            title: { [Op.like]: "%" + nameWord + "%" },
+            title: { [Op.regexp]: nameWords.join("|") },
+          },
+        ],
+      },
+      order: [["updatedAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      include: [
+        { model: model.District, attributes: ["simpleAddress"] },
+        { model: model.PostImage, attributes: ["postImageURI"] },
+      ],
+    });
+    if (postsInTitle.length <= 5) {
+      // 검색 결과가 적어 내용에서도 찾아냅니다.
+      const postsInContent = await model.Post.findAll({
+        where: {
+          [Op.or]: [
+            {
+              description: { [Op.like]: "%" + name + "%" },
+              description: { [Op.like]: "%" + nameWord + "%" },
+              description: { [Op.regexp]: nameWords.join("|") },
+            },
+            {
+              title: { [Op.like]: "%" + name + "%" },
+              title: { [Op.like]: "%" + nameWord + "%" },
+              title: { [Op.regexp]: nameWords.join("|") },
+            },
+          ],
+        },
+        order: [["updatedAt", "DESC"]],
+        attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+        include: [
+          { model: model.District, attributes: ["simpleAddress"] },
+          { model: model.PostImage, attributes: ["postImageURI"] },
+        ],
+      });
+      for (let i = 0; i < postsInContent.length; i++) {
+        let postImageURI = postsInContent[i].PostImages[0].postImageURI.split(",");
+        let post = {
+          id: postsInContent[i].id,
+          title: postsInContent[i].title,
+          deadline: postsInContent[i].deadline,
+          requiredTime: postsInContent[i].requiredTime,
+          updatedAt: postsInContent[i].updatedAt,
+          price: postsInContent[i].price,
+          status: postsInContent[i].status,
+          simpleAddress: postsInContent[i].District.simpleAddress,
+          thumbnail: postImageURI[0],
+          buyerId: postsInContent[i].buyerId, // 평점이 들어갈 구매자
+        };
+        resultPosts.push(post);
+      }
+      return res.status(200).json({ success: true, message: "심부름 제목과 내용을 고려하여 게시글들을 검색합니다.", resultPosts });
+    } else {
+      // TODO 가공후에 resultPost배열에 푸시
+      for (let i = 0; i < postsInTitle.length; i++) {
+        let postImageURI = postsInTitle[i].PostImages[0].postImageURI.split(",");
+        let post = {
+          id: postsInTitle[i].id,
+          title: postsInTitle[i].title,
+          deadline: postsInTitle[i].deadline,
+          requiredTime: postsInTitle[i].requiredTime,
+          updatedAt: postsInTitle[i].updatedAt,
+          price: postsInTitle[i].price,
+          status: postsInTitle[i].status,
+          simpleAddress: postsInTitle[i].District.simpleAddress,
+          thumbnail: postImageURI[0],
+          buyerId: postsInTitle[i].buyerId, // 평점이 들어갈 구매자
+        };
+        resultPosts.push(post);
+      }
+      return res.status(200).json({ success: true, message: "심부름 제목만으로 게시글들을 검색합니다.", resultPosts });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
