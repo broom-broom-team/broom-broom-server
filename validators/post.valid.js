@@ -94,11 +94,18 @@ exports.post_review = (req, res, next) => {
 };
 
 exports.get_search = (req, res, next) => {
-  let { name } = req.query;
-  name = name.trim();
-  if (name_regex.test(name)) {
-    next();
-  } else {
+  const { name, order } = req.query;
+  name.trim();
+  if (!name_regex.test(name)) {
     return res.status(400).json({ success: false, message: "검색 키워드는 1~20글자만 입력가능합니다." });
+  }
+  if (order != undefined) {
+    if (order === "updatedAt" || order === "deadline" || order === "price") {
+      next();
+    } else {
+      return res.status(400).json({ success: false, message: "정렬방식은 updatedAt, deadline, price만 입력가능합니다." });
+    }
+  } else {
+    next();
   }
 };
