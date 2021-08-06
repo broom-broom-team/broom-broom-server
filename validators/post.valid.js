@@ -94,18 +94,20 @@ exports.post_review = (req, res, next) => {
 };
 
 exports.get_search = (req, res, next) => {
-  const { name, order } = req.query;
+  const { name, order, filter } = req.query;
   name.trim();
   if (!name_regex.test(name)) {
     return res.status(400).json({ success: false, message: "검색 키워드는 1~20글자만 입력가능합니다." });
   }
-  if (order != undefined) {
-    if (order === "updatedAt" || order === "deadline" || order === "price") {
-      next();
-    } else {
+  if (order !== undefined) {
+    if (order !== "updatedAt" && order !== "deadline" && order !== "price") {
       return res.status(400).json({ success: false, message: "정렬방식은 updatedAt, deadline, price만 입력가능합니다." });
     }
-  } else {
-    next();
   }
+  if (filter !== undefined) {
+    if (filter !== "1" && filter !== "0") {
+      return res.status(400).json({ success: false, message: "심부름 불가능 안보기 버튼 클릭시 filter은 1이고 다시 해제했을때는 0입니다. 0과 1을 제외하고는 값을 주면 안됩니다." });
+    }
+  }
+  next();
 };

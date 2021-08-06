@@ -302,11 +302,12 @@ exports.get_search = async (req, res, next) => {
   try {
     const { name } = req.query;
     const page = Number(req.query.page) ? Number(req.query.page) : 1;
-    const orderTarget = req.query.order ? req.query.order : "updatedAt";
-    const orderMethod = orderTarget === "deadline" ? "ASC" : "DESC";
     const contentSize = 20;
     const firstIndex = (page - 1) * contentSize;
     const lastIndex = page * contentSize - 1;
+    const orderTarget = req.query.order ? req.query.order : "updatedAt";
+    const orderMethod = orderTarget === "deadline" ? "ASC" : "DESC";
+    const postFilter = Number(req.query.filter) ? "basic" : model.Post.rawAttributes.status.values;
     const searchPosts = [];
     name.trim();
     const nameWords = name.split(" ");
@@ -316,6 +317,7 @@ exports.get_search = async (req, res, next) => {
     }
     const postsInTitle = await model.Post.findAll({
       where: {
+        status: postFilter,
         [Op.or]: [
           {
             title: { [Op.like]: "%" + name + "%" },
@@ -335,6 +337,7 @@ exports.get_search = async (req, res, next) => {
       // 제목만으로 검색 결과가 적어 내용에서도 찾아냅니다.
       const postsInContent = await model.Post.findAll({
         where: {
+          status: postFilter,
           [Op.or]: [
             {
               description: { [Op.like]: "%" + name + "%" },
@@ -372,7 +375,7 @@ exports.get_search = async (req, res, next) => {
         searchPosts.push(post);
       }
       const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
-      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목과 내용을 고려하여 게시글들을 검색합니다.`, pagingPosts });
+      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목과 내용을 고려하여 게시글들을 검색 (filter: ${req.query.filter})`, pagingPosts });
     } else {
       for (let i = 0; i < postsInTitle.length; i++) {
         let postImageURI = postsInTitle[i].PostImages[0].postImageURI.split(",");
@@ -391,7 +394,7 @@ exports.get_search = async (req, res, next) => {
         searchPosts.push(post);
       }
       const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
-      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목만으로 게시글들을 검색합니다.`, pagingPosts });
+      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목만으로 게시글들을 검색 (filter: ${req.query.filter})`, pagingPosts });
     }
   } catch (e) {
     return next(e);
