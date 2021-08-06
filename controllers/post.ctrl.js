@@ -163,8 +163,8 @@ exports.get_history_me = async (req, res, next) => {
   try {
     const posts = await model.Post.findAll({
       where: { sellerId: req.user.id },
-      order: [["updatedAt", "DESC"]],
-      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
       include: [
         { model: model.District, attributes: ["simpleAddress"] },
         { model: model.PostImage, attributes: ["postImageURI"] },
@@ -182,6 +182,7 @@ exports.get_history_me = async (req, res, next) => {
           deadline: posts[i].deadline,
           requiredTime: posts[i].requiredTime,
           updatedAt: posts[i].updatedAt,
+          createdAt: posts[i].createdAt,
           price: posts[i].price,
           status: posts[i].status,
           simpleAddress: posts[i].District.simpleAddress,
@@ -202,8 +203,8 @@ exports.get_history_all = async (req, res, next) => {
     // await model.Review.create({ point: 3, registerId: 3, postId: 5 });
     const sellerPosts = await model.Post.findAll({
       where: { sellerId: req.user.id, [Op.or]: [{ status: "proceed" }, { status: "end" }] },
-      order: [["updatedAt", "DESC"]],
-      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
       include: [
         { model: model.District, attributes: ["simpleAddress"] },
         { model: model.PostImage, attributes: ["postImageURI"] },
@@ -212,8 +213,8 @@ exports.get_history_all = async (req, res, next) => {
     });
     const buyerPosts = await model.Post.findAll({
       where: { buyerId: req.user.id },
-      order: [["updatedAt", "DESC"]],
-      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "price", "status"],
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
       include: [
         { model: model.District, attributes: ["simpleAddress"] },
         { model: model.PostImage, attributes: ["postImageURI"] },
@@ -234,6 +235,7 @@ exports.get_history_all = async (req, res, next) => {
           deadline: buyerPosts[i].deadline,
           requiredTime: buyerPosts[i].requiredTime,
           updatedAt: buyerPosts[i].updatedAt,
+          createdAt: buyerPosts[i].createdAt,
           price: buyerPosts[i].price,
           status: buyerPosts[i].status,
           simpleAddress: buyerPosts[i].District.simpleAddress,
@@ -250,6 +252,7 @@ exports.get_history_all = async (req, res, next) => {
           deadline: sellerPosts[i].deadline,
           requiredTime: sellerPosts[i].requiredTime,
           updatedAt: sellerPosts[i].updatedAt,
+          createdAt: sellerPosts[i].createdAt,
           price: sellerPosts[i].price,
           status: sellerPosts[i].status,
           simpleAddress: sellerPosts[i].District.simpleAddress,
@@ -291,6 +294,112 @@ exports.post_review = async (req, res, next) => {
       } else {
         return res.status(400).json({ success: false, message: "리뷰작성 대상자가 아닙니다." });
       }
+    }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.get_search = async (req, res, next) => {
+  const Op = Sequelize.Op;
+  try {
+    const { name } = req.query;
+    const page = Number(req.query.page) ? Number(req.query.page) : 1;
+    const contentSize = 20;
+    const firstIndex = (page - 1) * contentSize;
+    const lastIndex = page * contentSize - 1;
+    const orderTarget = req.query.order ? req.query.order : "createdAt";
+    const orderMethod = orderTarget === "deadline" ? "ASC" : "DESC";
+    const postFilter = Number(req.query.filter) ? "basic" : model.Post.rawAttributes.status.values;
+    const searchPosts = [];
+    name.trim();
+    const nameWords = name.split(" ");
+    let nameWord = "";
+    for (let i = 0; i < nameWords.length; i++) {
+      nameWord += nameWords[i];
+    }
+    const postsInTitle = await model.Post.findAll({
+      where: {
+        status: postFilter,
+        [Op.or]: [
+          {
+            title: { [Op.like]: "%" + name + "%" },
+            title: { [Op.like]: "%" + nameWord + "%" },
+            title: { [Op.regexp]: nameWords.join("|") },
+          },
+        ],
+      },
+      order: [[orderTarget, orderMethod]],
+      attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
+      include: [
+        { model: model.District, attributes: ["simpleAddress"] },
+        { model: model.PostImage, attributes: ["postImageURI"] },
+      ],
+    });
+    if (postsInTitle.length <= 5) {
+      // 제목만으로 검색 결과가 적어 내용에서도 찾아냅니다.
+      const postsInContent = await model.Post.findAll({
+        where: {
+          status: postFilter,
+          [Op.or]: [
+            {
+              description: { [Op.like]: "%" + name + "%" },
+              description: { [Op.like]: "%" + nameWord + "%" },
+              description: { [Op.regexp]: nameWords.join("|") },
+            },
+            {
+              title: { [Op.like]: "%" + name + "%" },
+              title: { [Op.like]: "%" + nameWord + "%" },
+              title: { [Op.regexp]: nameWords.join("|") },
+            },
+          ],
+        },
+        order: [[orderTarget, orderMethod]],
+        attributes: ["id", "title", "deadline", "requiredTime", "updatedAt", "createdAt", "price", "status"],
+        include: [
+          { model: model.District, attributes: ["simpleAddress"] },
+          { model: model.PostImage, attributes: ["postImageURI"] },
+        ],
+      });
+      for (let i = 0; i < postsInContent.length; i++) {
+        let postImageURI = postsInContent[i].PostImages[0].postImageURI.split(",");
+        let post = {
+          id: postsInContent[i].id,
+          title: postsInContent[i].title,
+          deadline: postsInContent[i].deadline,
+          requiredTime: postsInContent[i].requiredTime,
+          updatedAt: postsInContent[i].updatedAt,
+          createdAt: postsInContent[i].createdAt,
+          price: postsInContent[i].price,
+          status: postsInContent[i].status,
+          simpleAddress: postsInContent[i].District.simpleAddress,
+          thumbnail: postImageURI[0],
+          buyerId: postsInContent[i].buyerId, // 평점이 들어갈 구매자
+        };
+        searchPosts.push(post);
+      }
+      const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
+      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목과 내용을 고려하여 게시글들을 검색 (filter: ${req.query.filter})`, pagingPosts });
+    } else {
+      for (let i = 0; i < postsInTitle.length; i++) {
+        let postImageURI = postsInTitle[i].PostImages[0].postImageURI.split(",");
+        let post = {
+          id: postsInTitle[i].id,
+          title: postsInTitle[i].title,
+          deadline: postsInTitle[i].deadline,
+          requiredTime: postsInTitle[i].requiredTime,
+          updatedAt: postsInTitle[i].updatedAt,
+          createdAt: postsInTitle[i].createdAt,
+          price: postsInTitle[i].price,
+          status: postsInTitle[i].status,
+          simpleAddress: postsInTitle[i].District.simpleAddress,
+          thumbnail: postImageURI[0],
+          buyerId: postsInTitle[i].buyerId, // 평점이 들어갈 구매자
+        };
+        searchPosts.push(post);
+      }
+      const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
+      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목만으로 게시글들을 검색 (filter: ${req.query.filter})`, pagingPosts });
     }
   } catch (e) {
     return next(e);

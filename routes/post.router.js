@@ -18,7 +18,7 @@ function postRouter(root) {
    * @description 심부름 상세보기
    * @routes GET /post/:id
    */
-  router.get("/:id", ctrl.post.get_post);
+  router.get("/detail/:id", ctrl.post.get_post);
 
   /**
    * @description 심부름 삭제하기
@@ -55,6 +55,12 @@ function postRouter(root) {
    * @routes POST /post/review/:id
    */
   router.post("/review/:id", valid.post.post_review, ctrl.post.post_review);
+  
+  /**
+   * @description 검색 후 페이지
+   * @routes GET /post/search?name&page
+   */
+  router.get("/search", valid.post.get_search, ctrl.post.get_search);
 }
 
 module.exports = postRouter;
