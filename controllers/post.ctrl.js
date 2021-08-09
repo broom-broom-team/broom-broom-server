@@ -318,8 +318,11 @@ exports.get_search = async (req, res, next) => {
     for (let i = 0; i < nameWords.length; i++) {
       nameWord += nameWords[i];
     }
+    const userAddress = await model.UserAddress.findOne({ where: { userId: req.user.id }, attributes: ["neighborhoods"] });
+    const neighborhoods = userAddress.neighborhoods.split(",");
     const postsInTitle = await model.Post.findAll({
       where: {
+        sellingDistrict: { [Op.in]: neighborhoods },
         status: postFilter,
         [Op.or]: [
           {
@@ -340,6 +343,7 @@ exports.get_search = async (req, res, next) => {
       // 제목만으로 검색 결과가 적어 내용에서도 찾아냅니다.
       const postsInContent = await model.Post.findAll({
         where: {
+          sellingDistrict: { [Op.in]: neighborhoods },
           status: postFilter,
           [Op.or]: [
             {
