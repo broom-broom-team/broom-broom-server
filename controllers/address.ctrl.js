@@ -88,9 +88,23 @@ exports.get_search = async (req, res, next) => {
 };
 
 exports.put_address = async (req, res, next) => {
+  const pool = require("../helpers/pool");
   const districtId = req.params.id;
   try {
-    await model.UserAddress.update({ districtId }, { where: { userId: req.user.id } });
+    const district = await model.District.findOne({ where: { id: districtId }, attributes: ["geopoint"] });
+    const userAddress = await model.UserAddress.findOne({ where: { userId: req.user.id } });
+    const conn = await pool.getConn();
+    const [districts] = await conn.query(
+      `SELECT * FROM districts WHERE ST_Intersects(geopolygon, ST_GeomFromText(ST_AsText(ST_Buffer(ST_GeomFromText(ST_AsText(ST_GeomFromText('
+      ${wkt.convert(district.geopoint)}', 4326))), ${userAddress.addressScope * 0.01})), 4326));`
+    );
+    conn.release();
+    let neighborhoods = new String();
+    for (let i = 0; i < districts.length; i++) {
+      neighborhoods += districts[i].id + ",";
+    }
+    neighborhoods = neighborhoods.slice(0, -1);
+    await model.UserAddress.update({ districtId, neighborhoods }, { where: { userId: req.user.id } });
     return res.status(200).json({ success: true, message: "기준지역을 변경이 완료되었습니다." });
   } catch (e) {
     return next(e);
