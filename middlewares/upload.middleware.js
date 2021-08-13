@@ -12,6 +12,15 @@ const profilestorage = multerS3({
   },
 });
 
+const imageMessageStorage = multerS3({
+  s3: s3,
+  bucket: "broombroom",
+  key: (req, file, done) => {
+    const extension = file.mimetype.split("/")[1];
+    done(null, "broomMessage-" + Date.now() + "." + extension);
+  },
+});
+
 const postStorage = multerS3({
   s3: s3,
   bucket: "broombroom",
@@ -33,3 +42,4 @@ const fileFilter = (req, file, done) => {
 
 exports.profileUpload = multer({ storage: profilestorage, fileFilter });
 exports.postUpload = multer({ storage: postStorage, fileFilter });
+exports.messageUpload = multer({ storage: imageMessageStorage, fileFilter });

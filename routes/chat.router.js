@@ -20,6 +20,12 @@ function chatRoter(root) {
    * @detail [첫메시지전송] 약속잡기 버튼을 누르고 만약 기존 채팅방이 만들어져있다면 거기로 이동 / 없다면 생성
    */
   router.post("/room/create/:postId", ctrl.chat.post_create_room);
+
+  /**
+   * @description 채팅 이미지 전송
+   * @routes POST /chat/image/:chatRoomId
+   */
+  router.post("/room/image/:chatRoomId", middleware.upload.messageUpload.single("image"), ctrl.chat.post_chat_image);
 }
 
 module.exports = chatRoter;

@@ -7,6 +7,7 @@ const connection = (io) => {
     enterRoom(socket);
     newRoom(socket, io);
     message(socket, io);
+    imageMessage(socket, io);
   });
 };
 
@@ -33,6 +34,7 @@ const enterRoom = (socket) => {
   });
 };
 
+// 이건 살짝 손봐야할 거 같음 => 의도한바는 채팅방 새로만들었을때 상대방에게 실시간으로 보여주기, 또는 채팅방에서 새로운 메세지가 보내지면 바로 갱신해서 보여주기임
 const newRoom = (socket, io) => {
   socket.on("newRoom", async (chatRoomId) => {
     const chatRoom = await model.ChatRoom.findOne({ id: chatRoomId });
@@ -76,6 +78,23 @@ const message = (socket, io) => {
     await model.ChatRoom.update({ lastChatDate: chatMessage.createdAt, lastChat }, { where: { id: chatRoomId } });
     const strChatRoomId = chatRoomId.toString(); // join으로 들어온 chatRoomId는 String이기 때문에 형변환
     io.to(strChatRoomId).emit("message", message); // 채팅방 목록과 채팅방안에서 message on으로 받음. 만약 처음 채팅방을 만드는 메세지에서 오면 socket newRoom으로 message 보내줌
+  });
+};
+
+const imageMessage = (socket, io) => {
+  socket.on("imageMessage", async (imageMessageInfo) => {
+    const { id, chatRoomId, content, messageImageURI, senderId, createdAt } = imageMessageInfo;
+    const image = {
+      id,
+      chatRoomId,
+      content,
+      senderId,
+      createdAt,
+      messageImageURI,
+    };
+    await model.ChatRoom.update({ lastChatDate: createdAt, lastChat: content }, { where: { id: chatRoomId } });
+    const strChatRoomId = imageMessageInfo.chatRoomId.toString();
+    io.to(strChatRoomId).emit("imageMessage", image);
   });
 };
 

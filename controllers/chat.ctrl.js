@@ -27,7 +27,7 @@ exports.get_chat_rooms = async (req, res, next) => {
         postTltie: chatRooms[i].Post.title,
         sellerId: chatRooms[i].Post.sellerId,
         setterId: chatRooms[i].setterId,
-        partner: chatRooms[i].setterId === req.user.id ? chatRooms[i].sellerId : chatRooms[i].setterId,
+        partner: chatRooms[i].setterId === req.user.id ? chatRooms[i].Post.sellerId : chatRooms[i].setterId,
       };
       myChatRooms.push(chatRoom);
     }
@@ -64,6 +64,21 @@ exports.post_create_room = async (req, res, next) => {
         content,
       });
     }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.post_chat_image = async (req, res, next) => {
+  // params나 query는 string으로 들어온다. => 형변환 필요
+  const { chatRoomId } = req.params;
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "파일이 없어 사진전송에 실패했습니다." });
+    }
+    const messageImageURI = req.file.location;
+    const message = await model.ChatMessage.create({ chatRoomId: chatRoomId, senderId: req.user.id, messageImageURI });
+    return res.status(200).json({ success: true, message: "사진을 전송합니다. 받은 데이터는 socket.emit('imageMessage')를 통해 보내주세요.", message });
   } catch (e) {
     return next(e);
   }
