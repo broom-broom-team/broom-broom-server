@@ -7,11 +7,11 @@ module.exports = class ChatRoom extends Sequelize.Model {
         // 외래키로만 구성
         lastChatDate: {
           type: Sequelize.DATE,
-          allowNull: false,
+          allowNull: true,
         },
         lastChat: {
           type: Sequelize.STRING(20),
-          allowNull: false,
+          allowNull: true,
         },
       },
       {
