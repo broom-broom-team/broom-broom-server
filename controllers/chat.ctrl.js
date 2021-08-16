@@ -1,5 +1,7 @@
 const model = require("../models");
 const Sequelize = require("sequelize");
+const { LexModelBuildingService } = require("aws-sdk");
+const { log } = require("winston");
 
 exports.get_chat_rooms = async (req, res, next) => {
   const Op = Sequelize.Op;
@@ -79,6 +81,53 @@ exports.post_chat_image = async (req, res, next) => {
     const messageImageURI = req.file.location;
     const message = await model.ChatMessage.create({ chatRoomId: chatRoomId, senderId: req.user.id, messageImageURI });
     return res.status(200).json({ success: true, message: "사진을 전송합니다. 받은 데이터는 socket.emit('imageMessage')를 통해 보내주세요.", message });
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.put_chat_status = async (req, res, next) => {
+  const { chatRoomId } = req.params;
+  const { type } = req.query;
+  try {
+    const chatRoom = await model.ChatRoom.findOne({ where: { id: chatRoomId }, attributes: ["postId", "setterId"] });
+    const post = await model.Post.findOne({ where: { id: chatRoom.postId } });
+    if (type === "reserve") {
+      // 약속확정 버튼을 눌렀을 때
+      if (post.status === "basic" && post.sellerId === req.user.id) {
+        const user = await model.User.findOne({ where: { id: req.user.id }, attributes: ["cash"] });
+        if (user.cash >= post.price) {
+          // TODO: 트랜잭션 넣기
+          await model.Post.update({ status: "proceed", buyerId: chatRoom.setterId }, { where: { id: post.id } });
+          await model.User.update({ cash: user.cash - post.price }, { where: { id: req.user.id } });
+          return res.status(200).json({ success: true, message: `약속확정이 완료되었습니다.` });
+        } else {
+          return res.status(400).json({ success: false, message: "회원님이 소지하신 금액보다 심부름 단가가 더 높아 약속확정이 불가능합니다." });
+        }
+      } else {
+        return res.status(400).json({ success: false, message: "약속확정이 불가능합니다. post의 상태나 로그인된 유저의 정보를 다시 확인해주세요." });
+      }
+    } else if (type === "finish") {
+      // 보상지급 버튼을 눌렀을 때
+      if ((post.status === "proceed" || post.status === "stop") && post.sellerId === req.user.id) {
+        const user = await model.User.findOne({ where: { id: post.buyerId }, attributes: ["cash"] });
+        await model.Post.update({ status: "end" }, { where: { id: post.id } });
+        await model.User.update({ cash: user.cash + post.price }, { where: { id: post.buyerId } });
+        return res.status(200).json({ success: true, message: `보상지급이 완료되었습니다.` });
+      } else {
+        return res.status(400).json({ success: false, message: "보상지급이 불가능합니다. post의 상태나 로그인된 유저의 정보를 다시 확인해주세요." });
+      }
+    } else if (type === "hold") {
+      // 보상보류 버튼을 눌렀을 때
+      if (post.status === "proceed" && post.sellerId === req.user.id) {
+        await model.Post.update({ status: "stop" }, { where: { id: post.id } });
+        return res.status(200).json({ success: true, message: `보상지급보류가 완료되었습니다.` });
+      } else {
+        return res.status(400).json({ success: false, message: "보상지급보류가 불가능합니다. post의 상태나 로그인된 유저의 정보를 다시 확인해주세요." });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "type은 reserve, finish, give로만 입력 가능합니다." });
+    }
   } catch (e) {
     return next(e);
   }

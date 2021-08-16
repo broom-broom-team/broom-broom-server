@@ -26,6 +26,12 @@ function chatRoter(root) {
    * @routes POST /chat/image/:chatRoomId
    */
   router.post("/room/image/:chatRoomId", middleware.upload.messageUpload.single("image"), ctrl.chat.post_chat_image);
+
+  /**
+   * @description 채팅방에서 상태 변경
+   * @routes PUT /chat/status/:chatRoomId?type
+   */
+  router.put("/status/:chatRoomId", ctrl.chat.put_chat_status);
 }
 
 module.exports = chatRoter;
