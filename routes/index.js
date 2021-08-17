@@ -4,6 +4,7 @@ const authRouter = require("./auth.router");
 const addressRouter = require("./address.router");
 const userRouter = require("./user.router");
 const postRouter = require("./post.router");
+const chatRouter = require("./chat.router");
 const rootRouter = Router();
 
 function router() {
@@ -12,6 +13,7 @@ function router() {
   addressRouter(rootRouter);
   userRouter(rootRouter);
   postRouter(rootRouter);
+  chatRouter(rootRouter);
 
   return rootRouter;
 }
