@@ -43,3 +43,22 @@ exports.delete_admin_cog = async (req, res, next) => {
     return next(e);
   }
 };
+
+exports.put_admin_cog_status = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const cogStatus = await model.AdminCog.findOne({ where: { id } });
+    if (!cogStatus) {
+      return res.status(400).json({ success: false, message: "없는 요청 내용입니다." });
+    }
+    if (cogStatus.status === "basic") {
+      await model.AdminCog.update({ status: "stop" }, { where: { id } });
+      return res.status(200).json({ success: true, message: "요청에 대한 승인을 보류상태로 변경합니다." });
+    } else if (cogStatus.status === "stop") {
+      await model.AdminCog.update({ status: "basic" }, { where: { id } });
+      return res.status(200).json({ success: true, message: "요청에 대한 승인을 원래상태로 변경합니다." });
+    }
+  } catch (e) {
+    return next(e);
+  }
+};

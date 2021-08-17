@@ -20,6 +20,11 @@ module.exports = class AdminCog extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
+        status: {
+          type: Sequelize.ENUM("basic", "stop"),
+          allowNull: false,
+          defaultValue: "basic",
+        },
       },
       {
         sequelize,
