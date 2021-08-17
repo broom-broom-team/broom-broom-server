@@ -1,7 +1,5 @@
 const model = require("../models");
 const Sequelize = require("sequelize");
-const { LexModelBuildingService } = require("aws-sdk");
-const { log } = require("winston");
 
 exports.get_chat_rooms = async (req, res, next) => {
   const Op = Sequelize.Op;
@@ -128,6 +126,22 @@ exports.put_chat_status = async (req, res, next) => {
     } else {
       return res.status(400).json({ success: false, message: "type은 reserve, finish, give로만 입력 가능합니다." });
     }
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.get_chat_room = async (req, res, next) => {
+  // TODO: 채팅방에다가 참여자 필드를 만드는게 좋을 것 같음
+  // TODO: 채팅방 조회는 참여자만 가능하게 하기로 이중으로 막아주면 좋을 것 같음
+  const { chatRoomId } = req.params;
+  try {
+    // 채팅내용은 카카오톡과 마찬가지로 위에 내용들이 오래된 내용들이 나옴
+    const chatMessages = await model.ChatMessage.findAll({
+      where: { chatRoomId },
+      order: [["createdAt", "ASC"]],
+    });
+    return res.status(200).json({ success: true, message: "해당 채팅방의 채팅내용을 불러옵니다.", chatMessages });
   } catch (e) {
     return next(e);
   }
