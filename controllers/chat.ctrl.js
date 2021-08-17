@@ -140,8 +140,46 @@ exports.get_chat_room = async (req, res, next) => {
     const chatMessages = await model.ChatMessage.findAll({
       where: { chatRoomId },
       order: [["createdAt", "ASC"]],
+      include: {
+        model: model.User,
+        attributes: ["id", "nickname", "mannerPoint"],
+        include: [
+          { model: model.UserAddress, attributes: ["id", "districtId"], include: { model: model.District, attributes: ["simpleAddress"] } },
+          { model: model.ProfileImage, attributes: ["profileImageURI"] },
+        ],
+      },
     });
-    return res.status(200).json({ success: true, message: "해당 채팅방의 채팅내용을 불러옵니다.", chatMessages });
+    const chatRoom = await model.ChatRoom.findOne({
+      where: { id: chatRoomId },
+      attributes: ["id", "setterId"],
+      include: { model: model.Post, attributes: ["id", "title", "status", "sellerId"] },
+    });
+    const chatRoomInfo = {
+      id: chatRoom.id,
+      setterId: chatRoom.setterId,
+      sellerId: chatRoom.Post.setterId,
+      postId: chatRoom.Post.postId,
+      postTitle: chatRoom.Post.title,
+      postStatus: chatRoom.Post.status,
+      partner: chatRoom.setterId === req.user.id ? chatRoom.Post.setterId : chatRoom.setterId,
+    };
+    const messages = [];
+    for (let i = 0; i < chatMessages.length; i++) {
+      let message = {
+        id: chatMessages[i].id,
+        content: chatMessages[i].content,
+        messageImageURI: chatMessages[i].messageImageURI,
+        createdAt: chatMessages[i].createdAt,
+        chatRoomId: chatMessages[i].chatRoomId,
+        senderId: chatMessages[i].senderId,
+        senderNickname: chatMessages[i].User.nickname,
+        senderMannerPoint: chatMessages[i].User.mannerPoint,
+        senderAddress: chatMessages[i].User.UserAddresses[0].District.simpleAddress,
+        senderProfileImage: chatMessages[i].User.ProfileImages[0].profileImageURI,
+      };
+      messages.push(message);
+    }
+    return res.status(200).json({ success: true, message: "해당 채팅방의 채팅내용을 불러옵니다.", chatRoomInfo, messages });
   } catch (e) {
     return next(e);
   }
