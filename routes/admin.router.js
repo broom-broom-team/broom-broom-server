@@ -13,6 +13,12 @@ function adminRouter(root) {
    * @routes GET /admin/cog?filter&page
    */
   router.get("/cog", ctrl.admin.get_admin_cog);
+
+  /**
+   * @description 충전/환급 진행 후 soft delete
+   * @routes DELETE /admin/cog/:id
+   */
+  router.delete("/cog/:id", ctrl.admin.delete_admin_cog);
 }
 
 module.exports = adminRouter;
