@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const logger = require("./helpers/winston");
 const passport = require("passport");
+const helmet = require("helmet");
 
 dotenv.config();
 
@@ -46,8 +47,9 @@ if (process.env.NODE_ENV === "production") {
 const sessionMiddleWare = session(sessionOption);
 
 // middleware setting
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV !== "development") {
   app.use(morgan("combined", { stream: logger.stream }));
+  app.use(helmet());
 } else {
   app.use(morgan("dev"));
 }
