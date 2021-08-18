@@ -20,6 +20,11 @@ module.exports = class AdminCog extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
+        status: {
+          type: Sequelize.ENUM("basic", "stop"),
+          allowNull: false,
+          defaultValue: "basic",
+        },
       },
       {
         sequelize,
@@ -27,7 +32,7 @@ module.exports = class AdminCog extends Sequelize.Model {
         underscored: false,
         modelName: "AdminCog",
         tableName: "adminCogs",
-        paranoid: false,
+        paranoid: true,
         charset: "utf8mb4",
         collate: "utf8mb4_general_ci",
       }

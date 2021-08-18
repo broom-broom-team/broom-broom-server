@@ -4,5 +4,6 @@ const address = require("../controllers/address.ctrl");
 const user = require("../controllers/user.ctrl");
 const post = require("../controllers/post.ctrl");
 const chat = require("../controllers/chat.ctrl");
+const admin = require("../controllers/admin.ctrl");
 
-module.exports = { main, auth, address, user, post, chat };
+module.exports = { main, auth, address, user, post, chat, admin };
