@@ -14,19 +14,19 @@ module.exports = {
   },
   // ec2's mysql
   test: {
-    username: "root",
-    password: null,
-    database: "database_test",
-    host: "127.0.0.1",
+    username: process.env.DB_USER_T,
+    password: process.env.DB_PASSWORD_T,
+    database: process.env.DB_DATABASE_T,
+    host: process.env.DB_HOST_T,
     timezone: "+09:00",
     dialect: "mysql",
   },
   // ec2's mysql(deploy)
   production: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    host: process.env.DB_HOST,
+    username: process.env.DB_USER_T,
+    password: process.env.DB_PASSWORD_T,
+    database: process.env.DB_DATABASE_T,
+    host: process.env.DB_HOST_T,
     timezone: "+09:00",
     dialect: "mysql",
   },
