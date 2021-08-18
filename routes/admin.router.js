@@ -10,7 +10,7 @@ function adminRouter(root) {
 
   /**
    * @description 충전/환급 요청하기 내역 조회
-   * @routes GET /admin/cog?filter&page
+   * @routes GET /admin/cog?filter&page?status
    */
   router.get("/cog", ctrl.admin.get_admin_cog);
 

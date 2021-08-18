@@ -5,8 +5,10 @@ exports.get_admin_cog = async (req, res, next) => {
   const contentSize = 20;
   const offset = (page - 1) * contentSize;
   const filter = Number(req.query.filter) ? false : true;
+  const status = req.query.status ? req.query.status : model.AdminCog.rawAttributes.status.values;
   try {
     const cog = await model.AdminCog.findAll({
+      where: { status },
       offset,
       limit: contentSize,
       paranoid: filter,
