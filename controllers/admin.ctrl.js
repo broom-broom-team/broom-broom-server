@@ -7,13 +7,13 @@ exports.get_admin_cog = async (req, res, next) => {
   const filter = Number(req.query.filter) ? false : true;
   const status = req.query.status ? req.query.status : model.AdminCog.rawAttributes.status.values;
   try {
-    const cog = await model.AdminCog.findAll({
+    const data = await model.AdminCog.findAll({
       where: { status },
       offset,
       limit: contentSize,
       paranoid: filter,
     });
-    return res.status(200).json({ success: true, message: "충전/환급 요청내역들을 불러옵니다.", cog });
+    return res.status(200).json({ success: true, message: "충전/환급 요청내역들을 불러옵니다.", data });
   } catch (e) {
     return next(e);
   }

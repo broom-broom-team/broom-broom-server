@@ -69,9 +69,9 @@ exports.get_post = async (req, res, next) => {
       buyCount,
     };
     if (post.User.deletedAt) {
-      return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo: "탈퇴한 회원" });
+      return res.status(200).json({ success: true, message: "심부름 상세보기", data: { postInfo, sellerInfo: "탈퇴한 회원" } });
     } else {
-      return res.status(200).json({ success: true, message: "심부름 상세보기", postInfo, sellerInfo });
+      return res.status(200).json({ success: true, message: "심부름 상세보기", data: { postInfo, sellerInfo } });
     }
   } catch (e) {
     return next(e);
@@ -104,7 +104,7 @@ exports.get_edit = async (req, res, next) => {
   const postId = req.params.id;
   try {
     const post = await model.Post.findOne({ where: { id: postId }, include: [{ model: model.PostImage }] });
-    const editpage = {
+    const data = {
       id: post.id,
       title: post.title,
       description: post.description,
@@ -115,7 +115,7 @@ exports.get_edit = async (req, res, next) => {
     };
     if (post.sellerId === req.user.id) {
       if (post.status === "basic") {
-        return res.status(200).json({ success: true, message: "심부름 수정을 위한 심부름 정보를 불러옵니다.", editpage });
+        return res.status(200).json({ success: true, message: "심부름 수정을 위한 심부름 정보를 불러옵니다.", data });
       } else {
         return res.status(400).json({ success: false, message: "심부름이 마감되었거나 약속확정 이후에는 수정할 수 없습니다." });
       }
@@ -190,7 +190,7 @@ exports.get_history_me = async (req, res, next) => {
         };
         history.push(post);
       }
-      return res.status(200).json({ success: true, message: "내가 작성한 심부름을 불러옵니다.", history });
+      return res.status(200).json({ success: true, message: "내가 작성한 심부름을 불러옵니다.", data: history });
     }
   } catch (e) {
     return next(e);
@@ -266,7 +266,7 @@ exports.get_history_all = async (req, res, next) => {
           (post.review = sellerPosts[i].Reviews[0] ? sellerPosts[i].Reviews[0].point : null), sellerEnd.push(post);
         }
       }
-      return res.status(200).json({ success: true, message: "내가 이용한 심부름을 불러옵니다.", buyerUsage, sellerProceed, sellerEnd });
+      return res.status(200).json({ success: true, message: "내가 이용한 심부름을 불러옵니다.", data: { buyerUsage, sellerProceed, sellerEnd } });
     }
   } catch (e) {
     return next(e);
@@ -383,7 +383,9 @@ exports.get_search = async (req, res, next) => {
         searchPosts.push(post);
       }
       const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
-      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목과 내용을 고려하여 게시글들을 검색 (filter: ${req.query.filter})`, pagingPosts });
+      return res
+        .status(200)
+        .json({ success: true, message: `${orderTarget}기준으로 심부름 제목과 내용을 고려하여 게시글들을 검색 (filter: ${req.query.filter})`, data: pagingPosts });
     } else {
       for (let i = 0; i < postsInTitle.length; i++) {
         let postImageURI = postsInTitle[i].PostImages[0].postImageURI.split(",");
@@ -403,7 +405,7 @@ exports.get_search = async (req, res, next) => {
         searchPosts.push(post);
       }
       const pagingPosts = searchPosts.slice(firstIndex, lastIndex);
-      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목만으로 게시글들을 검색 (filter: ${req.query.filter})`, pagingPosts });
+      return res.status(200).json({ success: true, message: `${orderTarget}기준으로 심부름 제목만으로 게시글들을 검색 (filter: ${req.query.filter})`, data: pagingPosts });
     }
   } catch (e) {
     return next(e);

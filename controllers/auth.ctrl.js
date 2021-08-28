@@ -53,8 +53,8 @@ exports.post_signin = async (req, res, next) => {
       if (loginError) {
         return next(loginError);
       }
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "5h" });
-      return res.status(200).json({ success: true, message: "로그인에 성공하였습니다.", token });
+      const data = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "5h" });
+      return res.status(200).json({ success: true, message: "로그인에 성공하였습니다.", data });
     });
   })(req, res, next);
 };
@@ -70,7 +70,7 @@ exports.post_send = async (req, res, next) => {
       // TODO: 쿠키로 보관시 보안상문제있는지 물어보기 -> 어차피 암호화돼서 상관없으려나..?
       const secretKey = generateSecret();
       await sendSecretMail(email, secretKey);
-      return res.cookie("secretKey", secretKey, { expiresIn: "30m" }).status(200).json({ success: true, message: "이메일 전송을 성공하였습니다.", secretKey });
+      return res.cookie("secretKey", secretKey, { expiresIn: "30m" }).status(200).json({ success: true, message: "이메일 전송을 성공하였습니다.", data: secretKey });
     }
   } catch (e) {
     return next(e);

@@ -31,7 +31,7 @@ exports.get_chat_rooms = async (req, res, next) => {
       };
       myChatRooms.push(chatRoom);
     }
-    return res.status(200).json({ success: true, message: "회원님의 채팅목록들을 불러옵니다.", myChatRooms });
+    return res.status(200).json({ success: true, message: "회원님의 채팅목록들을 불러옵니다.", data: myChatRooms });
   } catch (e) {
     return next(e);
   }
@@ -53,15 +53,15 @@ exports.post_create_room = async (req, res, next) => {
       where: { postId, setterId: req.user.id },
     });
     if (chatRoom) {
-      // url: /chat/room/:id
-      return res.status(200).json({ success: true, message: "이미 개설된 채팅방이 존재합니다. 해당 채팅방으로 이동합니다.", chatRoomId: chatRoom.id });
+      // url: /chat/room/:d
+      return res.status(200).json({ success: true, message: "이미 개설된 채팅방이 존재합니다. 해당 채팅방으로 이동합니다.", data: chatRoom.id });
     } else {
       const createdChatRoom = await model.ChatRoom.create({ setterId: req.user.id, postId });
+      const data = { chatRoomId: createdChatRoom.id, content };
       return res.status(200).json({
         success: true,
         message: "채팅방 개설이 완료되었습니다. 이 작업을 마친 후에 socket으로 message에 content와 chatRoomId를 보내주세요.",
-        chatRoomId: createdChatRoom.id,
-        content,
+        data,
       });
     }
   } catch (e) {
@@ -78,7 +78,7 @@ exports.post_chat_image = async (req, res, next) => {
     }
     const messageImageURI = req.file.location;
     const message = await model.ChatMessage.create({ chatRoomId: chatRoomId, senderId: req.user.id, messageImageURI });
-    return res.status(200).json({ success: true, message: "사진을 전송합니다. 받은 데이터는 socket.emit('imageMessage')를 통해 보내주세요.", message });
+    return res.status(200).json({ success: true, message: "사진을 전송합니다. 받은 데이터는 socket.emit('imageMessage')를 통해 보내주세요.", data: message });
   } catch (e) {
     return next(e);
   }
@@ -179,7 +179,8 @@ exports.get_chat_room = async (req, res, next) => {
       };
       messages.push(message);
     }
-    return res.status(200).json({ success: true, message: "해당 채팅방의 채팅내용을 불러옵니다.", chatRoomInfo, messages });
+    const data = { chatRoomInfo, messages };
+    return res.status(200).json({ success: true, message: "해당 채팅방의 채팅내용을 불러옵니다.", data });
   } catch (e) {
     return next(e);
   }

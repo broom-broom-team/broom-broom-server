@@ -7,14 +7,14 @@ exports.get_user = async (req, res, next) => {
   try {
     const user = await model.User.findOne({ include: [{ model: model.ProfileImage }], where: { id: req.user.id } });
     const userAddress = await model.UserAddress.findOne({ include: [{ model: model.District }] }, { where: { userId: req.user.id } });
-    const mypage = {
+    const data = {
       nickname: user.nickname,
       mannerPoint: user.mannerPoint.toFixed(2),
       cash: user.cash.toLocaleString() + "P",
       simpleAddress: userAddress.District.simpleAddress,
       profileImageURI: user.ProfileImages[0].profileImageURI,
     };
-    return res.status(200).json({ success: true, message: "마이페이지 유저정보를 불러옵니다.", mypage });
+    return res.status(200).json({ success: true, message: "마이페이지 유저정보를 불러옵니다.", data });
   } catch (e) {
     return next(e);
   }
@@ -23,13 +23,13 @@ exports.get_user = async (req, res, next) => {
 exports.get_edit = async (req, res, next) => {
   try {
     const user = await model.User.findOne({ include: [{ model: model.ProfileImage }], where: { id: req.user.id } });
-    const editpage = {
+    const data = {
       nickname: user.nickname,
       name: user.name,
       phoneNumber: user.phoneNumber,
       profileImageURI: user.ProfileImages[0].profileImageURI,
     };
-    return res.status(200).json({ success: true, message: "프로필 수정을 위한 기존 유저정보를 불러옵니다.", editpage });
+    return res.status(200).json({ success: true, message: "프로필 수정을 위한 기존 유저정보를 불러옵니다.", data });
   } catch (e) {
     return next(e);
   }
@@ -139,8 +139,8 @@ exports.put_edit_pwd = async (req, res, next) => {
 exports.get_point = async (req, res, next) => {
   try {
     const user = await model.User.findByPk(req.user.id);
-    const cash = user.cash.toLocaleString() + "P";
-    return res.status(200).json({ success: true, message: "유저 포인트를 불러옵니다.", cash });
+    const data = user.cash.toLocaleString() + "P";
+    return res.status(200).json({ success: true, message: "유저 포인트를 불러옵니다.", data });
   } catch (e) {
     return next(e);
   }

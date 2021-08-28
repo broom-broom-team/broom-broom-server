@@ -6,11 +6,11 @@ const Op = Sequelize.Op;
 exports.get_address = async (req, res, next) => {
   try {
     const userAddress = await model.UserAddress.findOne({ where: { userId: req.user.id }, include: { model: model.District } });
+    const data = { simpleAddress: userAddress.District.simpleAddress, addressScope: userAddress.addressScope };
     return res.status(200).json({
       success: true,
       message: "회원의 기준지역과 활동범위를 반환합니다.",
-      simpleAddress: userAddress.District.simpleAddress,
-      addressScope: userAddress.addressScope,
+      data,
     });
   } catch (e) {
     return next(e);
@@ -33,7 +33,8 @@ exports.post_check = async (req, res, next) => {
     for (let i = 0; i < districts.length; i++) {
       neighborhoods.push(districts[i].simpleAddress);
     }
-    return res.status(200).json({ success: true, message: "활동범위내 근처동네들을 불러옵니다.", count: neighborhoods.length, neighborhoods });
+    const data = { count: neighborhoods.length, neighborhoods };
+    return res.status(200).json({ success: true, message: "활동범위내 근처동네들을 불러옵니다.", data });
   } catch (e) {
     return next(e);
   }
@@ -81,7 +82,11 @@ exports.get_search = async (req, res, next) => {
     for (let i = 0; i < districts.length; i++) {
       result.push({ ADMNM: districts[i].ADMNM, districtId: districts[i].id });
     }
-    return res.status(200).json({ success: true, message: "기준지역 검색결과를 불러옵니다.", count: districts.length, result });
+    const data = {
+      count: districts.length,
+      result,
+    };
+    return res.status(200).json({ success: true, message: "기준지역 검색결과를 불러옵니다.", data });
   } catch (e) {
     return next(e);
   }
