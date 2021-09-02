@@ -56,8 +56,8 @@ exports.post_point = (req, res, next) => {
   // type에 따라 필수로 입력해야하는 값이 있다. => 충전: chargeAmount, 환급: refundAmount, bankName, account
   const type = req.params.type;
   if (type == "charge") {
-    const { chargeAmount } = req.body;
-    if (chargeAmount) {
+    const { chargeAmount, bankName, account } = req.body;
+    if (chargeAmount && bankName && account) {
       if (amount_regex.test(chargeAmount)) {
         next();
       } else {
